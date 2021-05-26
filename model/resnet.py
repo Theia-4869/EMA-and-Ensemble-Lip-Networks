@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-import numpy as np
+
 from model.norm_dist import NormDistConv, NormDist
 from model.bound_module import BoundReLU, BoundMeanNorm, BoundLinear
 from model.bound_module import BoundMaxPool2d, BoundAvgPool2d, BoundAdaptiveMaxPool2d, BoundAdaptiveAvgPool2d
