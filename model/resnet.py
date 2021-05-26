@@ -69,9 +69,9 @@ class Bottleneck(nn.Module):
             return out
 
 
-class ResNet(nn.Module):
+class resNet(nn.Module):
     def __init__(self, block, num_blocks, in_channel=3, zero_init_residual=False):
-        super(ResNet, self).__init__()
+        super(resNet, self).__init__()
         self.in_planes = 64
 
         self.conv = NormDistConv(in_channel, 64, kernel_size=3, stride=1, padding=1, bias=False, mean_normalize=True)
@@ -113,19 +113,19 @@ class ResNet(nn.Module):
 
 
 def resnet18(**kwargs):
-    return ResNet(BasicBlock, [2, 2, 2, 2], **kwargs)
+    return resNet(BasicBlock, [2, 2, 2, 2], **kwargs)
 
 
 def resnet34(**kwargs):
-    return ResNet(BasicBlock, [3, 4, 6, 3], **kwargs)
+    return resNet(BasicBlock, [3, 4, 6, 3], **kwargs)
 
 
 def resnet50(**kwargs):
-    return ResNet(Bottleneck, [3, 4, 6, 3], **kwargs)
+    return resNet(Bottleneck, [3, 4, 6, 3], **kwargs)
 
 
 def resnet101(**kwargs):
-    return ResNet(Bottleneck, [3, 4, 23, 3], **kwargs)
+    return resNet(Bottleneck, [3, 4, 23, 3], **kwargs)
 
 
 model_dict = {
@@ -136,13 +136,42 @@ model_dict = {
 }
 
 
-class ResNetFeature(nn.Module):
+class ResNet(nn.Module):
     """backbone + projection head"""
     def __init__(self, name='resnet50', head='mlp', feat_dim=128, num_classes=10):
+        super(ResNet, self).__init__()
+        model_fun, dim_in = model_dict[name]
+        self.encoder = model_fun()
+        head = []
+        if head == 'linear':
+            head.append(BoundLinear(dim_in, feat_dim, bias=False))
+            head.append(BoundReLU())
+            head.append(BoundLinear(feat_dim, num_classes))
+        elif head == 'mlp':
+            head.append(BoundLinear(dim_in, dim_in, bias=False))
+            head.append(BoundReLU())
+            head.append(BoundLinear(dim_in, feat_dim, bias=False))
+            head.append(BoundReLU())
+            head.append(BoundLinear(feat_dim, num_classes))
+        else:
+            raise NotImplementedError(
+                'head not supported: {}'.format(head))
+        self.head = nn.ModuleList(head)
+
+    def forward(self, x, lower=None, upper=None):
+        paras = (x, lower, upper)
+        paras = self.encoder(*paras)
+        for layer in self.head:
+            paras = layer(*paras)
+        paras = [None if y is None else -y for y in (paras[0], paras[2], paras[1])]
+        return paras
+
+class ResNetFeature(nn.Module):
+    """backbone + projection head"""
+    def __init__(self, name='resnet50', head='mlp', feat_dim=128):
         super(ResNetFeature, self).__init__()
         model_fun, dim_in = model_dict[name]
         self.encoder = model_fun()
-        self.num_classes = num_classes
         head = []
         if head == 'linear':
             head.append(BoundLinear(dim_in, feat_dim, bias=False))
