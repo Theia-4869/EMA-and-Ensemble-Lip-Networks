@@ -3,8 +3,8 @@ import torch
 import torch.nn as nn
 
 class BoundReLU(nn.ReLU):
-    def __init__(self):
-        super(BoundReLU, self).__init__()
+    def __init__(self, inplace=False):
+        super(BoundReLU, self).__init__(inplace=inplace)
     def forward(self, x, lower=None, upper=None):
         y = super(BoundReLU, self).forward(x)
         if lower is None or upper is None:
@@ -114,3 +114,31 @@ class Predictor(nn.Module):
         ret = self.tanh(*ret)
         ret = self.fc2(*ret, targets=targets)
         return ret
+
+class BoundMaxPool2d(nn.MaxPool1d):
+    def __init__(self, kernel_size, stride=None, padding=0, dilation=1, return_indices=False, ceil_mode=False):
+        super(BoundMaxPool2d, self).__init__(kernel_size, stride=stride, padding=padding, dilation=dilation, return_indices=return_indices, ceil_mode=ceil_mode)
+    def forward(self, x, lower=None, upper=None):
+        y = super(BoundMaxPool2d, self).forward(x)
+        return y, lower, upper
+
+class BoundAvgPool2d(nn.AvgPool2d):
+    def __init__(self, kernel_size, stride=None, padding=0, ceil_mode=False, count_include_pad=True, divisor_override=None):
+        super(BoundAvgPool2d, self).__init__(kernel_size, stride=stride, padding=padding, ceil_mode=ceil_mode, count_include_pad=count_include_pad, divisor_override=divisor_override)
+    def forward(self, x, lower=None, upper=None):
+        y = super(BoundAvgPool2d, self).forward(x)
+        return y, lower, upper
+
+class BoundAdaptiveMaxPool2d(nn.AdaptiveMaxPool2d):
+    def __init__(self, output_size, return_indices=False):
+        super(BoundAdaptiveMaxPool2d, self).__init__(output_size, return_indices=return_indices)
+    def forward(self, x, lower=None, upper=None):
+        y = super(BoundAdaptiveMaxPool2d, self).forward(x)
+        return y, lower, upper
+
+class BoundAdaptiveAvgPool2d(nn.AdaptiveAvgPool2d):
+    def __init__(self, output_size):
+        super(BoundAdaptiveAvgPool2d, self).__init__(output_size)
+    def forward(self, x, lower=None, upper=None):
+        y = super(BoundAdaptiveAvgPool2d, self).forward(x)
+        return y, lower, upper

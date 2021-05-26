@@ -36,7 +36,7 @@ parser.add_argument('--wd', default=0.0, type=float)
 parser.add_argument('--start-epoch', default=0, type=int)
 parser.add_argument('--checkpoint', default=None, type=str)
 
-parser.add_argument('--gpu', default=-1, type=int, help='GPU id to use')
+parser.add_argument('--gpu', default=0, type=int, help='GPU id to use')
 parser.add_argument('--dist-url', default='tcp://localhost:23456')
 parser.add_argument('--world-size', default=1)
 parser.add_argument('--rank', default=0)

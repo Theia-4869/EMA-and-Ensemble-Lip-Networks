@@ -9,26 +9,31 @@ mean = {
     'MNIST': np.array([0.1307]),
     'FashionMNIST': np.array([0.2860]),
     'CIFAR10': np.array([0.4914, 0.4822, 0.4465]),
+    'CIFAR100': np.array([0.5071, 0.4867, 0.4408]),
 }
 std = {
     'MNIST': 0.3081,
     'FashionMNIST': 0.3520,
     'CIFAR10': 0.2009, #np.array([0.2023, 0.1994, 0.2010])
+    'CIFAR100': 0.2667, #np.array([0.2675, 0.2565, 0.2761])
 }
 train_transforms = {
     'MNIST': [transforms.RandomCrop(28, padding=1)],
     'FashionMNIST': [transforms.RandomCrop(28, padding=1)],
     'CIFAR10': [transforms.RandomCrop(32, padding=4), transforms.RandomHorizontalFlip()],
+    'CIFAR100': [transforms.RandomCrop(32, padding=4), transforms.RandomHorizontalFlip()],
 }
 input_dim = {
     'MNIST': np.array([1, 28, 28]),
     'FashionMNIST': np.array([1, 28, 28]),
     'CIFAR10': np.array([3, 32, 32]),
+    'CIFAR100': np.array([3, 32, 32]),
 }
 default_eps = {
     'MNIST': 0.3,
     'FashionMNIST': 0.1,
     'CIFAR10': 0.03137,
+    'CIFAR100': 0.03137,
 }
 
 def get_statistics(dataset):

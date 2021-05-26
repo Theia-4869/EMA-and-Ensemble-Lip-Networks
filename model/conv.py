@@ -1,6 +1,7 @@
 import torch.nn as nn
-from model.norm_dist import NormDistConv, NormDist
 import numpy as np
+from model.norm_dist import NormDistConv, NormDist
+
 net_width = 32
 
 class Conv(nn.Module):
