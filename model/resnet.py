@@ -142,7 +142,6 @@ class ResNet(nn.Module):
         super(ResNet, self).__init__()
         model_fun, dim_in = model_dict[name]
         self.encoder = model_fun()
-        head = []
         if head == 'linear':
             head.append(BoundLinear(dim_in, feat_dim, bias=False))
             head.append(BoundReLU())
@@ -172,7 +171,6 @@ class ResNetFeature(nn.Module):
         super(ResNetFeature, self).__init__()
         model_fun, dim_in = model_dict[name]
         self.encoder = model_fun()
-        head = []
         if head == 'linear':
             head.append(BoundLinear(dim_in, feat_dim, bias=False))
         elif head == 'mlp':
