@@ -4,9 +4,9 @@ from model.norm_dist import NormDistConv, NormDist
 from model.bound_module import BoundReLU, BoundMeanNorm, BoundLinear
 from model.bound_module import BoundMaxPool2d, BoundAvgPool2d, BoundAdaptiveMaxPool2d, BoundAdaptiveAvgPool2d
 
-class VGG19Net(nn.Module):
+class VGGNet(nn.Module):
     def __init__(self, input_dim, num_classes=10):
-        super(VGG19Net, self).__init__()
+        super(VGGNet, self).__init__()
         self.layer1 = self._make_layer(3, 64, 2)
         self.layer2 = self._make_layer(64, 128, 2)
         self.layer3 = self._make_layer(128, 256, 4)
@@ -54,9 +54,9 @@ class VGG19Net(nn.Module):
         paras = [None if y is None else -y for y in (paras[0], paras[2], paras[1])]
         return paras
 
-class VGG19NetFeature(nn.Module):
+class VGGNetFeature(nn.Module):
     def __init__(self, input_dim):
-        super(VGG19NetFeature, self).__init__()
+        super(VGGNetFeature, self).__init__()
         self.layer1 = self._make_layer(3, 64, 2)
         self.layer2 = self._make_layer(64, 128, 2)
         self.layer3 = self._make_layer(128, 256, 4)

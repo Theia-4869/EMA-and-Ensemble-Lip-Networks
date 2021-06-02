@@ -280,7 +280,7 @@ def main_worker(gpu, parallel, args, result_dir):
     from model.conv import ConvFeature, Conv
     from model.lenet import LeNetFeature, LeNet
     from model.alexnet import AlexNetFeature, AlexNet
-    from model.vggnet import VGG19NetFeature, VGG19Net
+    from model.vggnet import VGGNetFeature, VGGNet
     from model.resnet import ResNetFeature, ResNet
     model_name, params = parse_function_call(args.model)
     if args.predictor_hidden_size > 0:
