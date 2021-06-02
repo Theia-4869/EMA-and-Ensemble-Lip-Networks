@@ -108,7 +108,7 @@ class resNet(nn.Module):
         for layer in self.layer4:
             paras = layer(*paras)
         paras = self.avgpool(*paras)
-        x = torch.flatten(x, 1)
+        x = x.view(x.size(0), -1)
         return paras
 
 
@@ -161,11 +161,8 @@ class ResNet(nn.Module):
     def forward(self, x, lower=None, upper=None):
         paras = (x, lower, upper)
         paras = self.encoder(*paras)
-        num = 0
         for layer in self.head:
-            print(num)
             paras = layer(*paras)
-            num+=1
         paras = [None if y is None else -y for y in (paras[0], paras[2], paras[1])]
         return paras
 
