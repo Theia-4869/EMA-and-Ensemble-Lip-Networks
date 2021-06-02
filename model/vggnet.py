@@ -24,11 +24,13 @@ class VGGNet(nn.Module):
     def _make_layer(in_channel, out_channel, conv_num, pool=True):
         layers = []
 
-        layers.append(NormDistConv(in_channel, out_channel, 3, 1, 1, bias=False, mean_normalize=True))
+        layers.append(NormDistConv(in_channels=in_channel, out_channels=out_channel, kernel_size=3, 
+                                    stride=1, padding=1, bias=False, mean_normalize=True))
         layers.append(BoundReLU())
 
         for i in range(conv_num):
-            layers.append(NormDistConv(out_channel, out_channel, 3, 1, 1, bias=False, mean_normalize=True))
+            layers.append(NormDistConv(in_channels=out_channel, out_channels=out_channel, kernel_size=3,  
+                                        stride=1, padding=1, bias=False, mean_normalize=True))
             layers.append(BoundReLU())
         
         if pool:
@@ -73,11 +75,13 @@ class VGGNetFeature(nn.Module):
     def _make_layer(in_channel, out_channel, conv_num, pool=True):
         layers = []
 
-        layers.append(NormDistConv(in_channel, out_channel, 3, 1, 1, bias=False, mean_normalize=True))
+        layers.append(NormDistConv(in_channels=in_channel, out_channels=out_channel, kernel_size=3, 
+                                    stride=1, padding=1, bias=False, mean_normalize=True))
         layers.append(BoundReLU())
 
         for i in range(conv_num):
-            layers.append(NormDistConv(out_channel, out_channel, 3, 1, 1, bias=False, mean_normalize=True))
+            layers.append(NormDistConv(in_channels=out_channel, out_channels=out_channel, kernel_size=3,  
+                                        stride=1, padding=1, bias=False, mean_normalize=True))
             layers.append(BoundReLU())
         
         if pool:
