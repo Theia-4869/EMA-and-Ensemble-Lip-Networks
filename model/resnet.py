@@ -97,7 +97,7 @@ class resNet(nn.Module):
 
     def forward(self, x, lower=None, upper=None):
         paras = (x, lower, upper)
-        paras = self.conv1(*paras)
+        paras = self.conv(*paras)
         paras = self.relu(*paras)
         for layer in self.layer1:
             paras = layer(*paras)
