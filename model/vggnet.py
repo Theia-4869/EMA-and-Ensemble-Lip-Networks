@@ -25,11 +25,11 @@ class VGGNet(nn.Module):
         layers = []
 
         layers.append(NormDistConv(in_channel, out_channel, 3, 1, 1, bias=False, mean_normalize=True))
-        layers.append(BoundReLU(inplace=True))
+        layers.append(BoundReLU())
 
         for i in range(conv_num):
             layers.append(NormDistConv(out_channel, out_channel, 3, 1, 1, bias=False, mean_normalize=True))
-            layers.append(BoundReLU(inplace=True))
+            layers.append(BoundReLU())
         
         if pool:
             layers.append(BoundMaxPool2d(2))
@@ -74,11 +74,11 @@ class VGGNetFeature(nn.Module):
         layers = []
 
         layers.append(NormDistConv(in_channel, out_channel, 3, 1, 1, bias=False, mean_normalize=True))
-        layers.append(BoundReLU(inplace=True))
+        layers.append(BoundReLU())
 
         for i in range(conv_num):
             layers.append(NormDistConv(out_channel, out_channel, 3, 1, 1, bias=False, mean_normalize=True))
-            layers.append(BoundReLU(inplace=True))
+            layers.append(BoundReLU())
         
         if pool:
             layers.append(BoundMaxPool2d(2))
