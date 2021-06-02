@@ -21,9 +21,9 @@ class VGGNet(nn.Module):
         fc.append(BoundLinear(256, num_classes))
         self.fc = nn.ModuleList(fc)
 
-    def _make_layer(in_channel, out_channel, conv_num, pool=True):
+    def _make_layer(self, in_channel, out_channel, conv_num, pool=True):
         layers = []
-        print('in_channel = ',in_channel)
+
         layers.append(NormDistConv(in_channels=in_channel, out_channels=out_channel, kernel_size=3, 
                                     stride=1, padding=1, bias=False, mean_normalize=True))
         layers.append(BoundReLU())
