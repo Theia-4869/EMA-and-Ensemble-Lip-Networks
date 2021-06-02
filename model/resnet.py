@@ -27,7 +27,7 @@ class BasicBlock(nn.Module):
         out2 = paras
         if self.shortcut:
             out2 = self.shortcut(*out2)
-        out = [i + j for i, j in zip(out1, out2)] 
+        out = [None if i is None or j is None else i + j for i, j in zip(out1, out2)] 
         preact = out
         out = self.relu(*out)
         if self.is_last:
@@ -60,7 +60,7 @@ class Bottleneck(nn.Module):
         out2 = paras
         if self.shortcut:
             out2 = self.shortcut(*out2)
-        out = [i + j for i, j in zip(out1, out2)] 
+        out = [None if i is None or j is None else i + j for i, j in zip(out1, out2)] 
         preact = out
         out = self.relu(*out)
         if self.is_last:
