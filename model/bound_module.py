@@ -115,7 +115,7 @@ class Predictor(nn.Module):
         ret = self.fc2(*ret, targets=targets)
         return ret
 
-class BoundMaxPool2d(nn.MaxPool1d):
+class BoundMaxPool2d(nn.MaxPool2d):
     def __init__(self, kernel_size, stride=None, padding=0, dilation=1, return_indices=False, ceil_mode=False):
         super(BoundMaxPool2d, self).__init__(kernel_size, stride=stride, padding=padding, dilation=dilation, return_indices=return_indices, ceil_mode=ceil_mode)
     def forward(self, x, lower=None, upper=None):
