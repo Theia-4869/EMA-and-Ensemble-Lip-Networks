@@ -9,29 +9,29 @@ class AlexNet(nn.Module):
         super(AlexNet, self).__init__()
         conv1 = []
         conv1.append(NormDistConv(3, 96, 7, 2, 2, bias=False))
-        conv1.append(BoundReLU(inplace=True))
+        conv1.append(BoundReLU())
         conv1.append(BoundMaxPool2d(3, 2, 0))
         self.conv1 = nn.ModuleList(conv1)
 
         conv2 = []
         conv2.append(NormDistConv(96, 256, 5, 1, 2, bias=False))
-        conv2.append(BoundReLU(inplace=True))
+        conv2.append(BoundReLU())
         conv2.append(BoundMaxPool2d(3, 2, 0))
         self.conv2 = nn.ModuleList(conv2)
 
         conv3 = []
         conv3.append(NormDistConv(256, 384, 3, 1, 1, bias=False))
-        conv3.append(BoundReLU(inplace=True))
+        conv3.append(BoundReLU())
         self.conv3 = nn.ModuleList(conv3)
 
         conv4 = []
         conv4.append(NormDistConv(384, 384, 3, 1, 1, bias=False))
-        conv4.append(BoundReLU(inplace=True))
+        conv4.append(BoundReLU())
         self.conv4 = nn.ModuleList(conv4)
 
         conv5 = []
         conv5.append(NormDistConv(384, 256, 3, 1, 1, bias=False))
-        conv5.append(BoundReLU(inplace=True))
+        conv5.append(BoundReLU())
         self.conv5 = nn.ModuleList(conv5)
 
         fc = []
@@ -65,29 +65,29 @@ class AlexNetFeature(nn.Module):
         super(AlexNetFeature, self).__init__()
         conv1 = []
         conv1.append(NormDistConv(3, 96, 7, 2, 2, bias=False))
-        conv1.append(BoundReLU(inplace=True))
+        conv1.append(BoundReLU())
         conv1.append(BoundMaxPool2d(3, 2, 0))
         self.conv1 = nn.ModuleList(conv1)
 
         conv2 = []
         conv2.append(NormDistConv(96, 256, 5, 1, 2, bias=False))
-        conv2.append(BoundReLU(inplace=True))
+        conv2.append(BoundReLU())
         conv2.append(BoundMaxPool2d(3, 2, 0))
         self.conv2 = nn.ModuleList(conv2)
 
         conv3 = []
         conv3.append(NormDistConv(256, 384, 3, 1, 1, bias=False))
-        conv3.append(BoundReLU(inplace=True))
+        conv3.append(BoundReLU())
         self.conv3 = nn.ModuleList(conv3)
 
         conv4 = []
         conv4.append(NormDistConv(384, 384, 3, 1, 1, bias=False))
-        conv4.append(BoundReLU(inplace=True))
+        conv4.append(BoundReLU())
         self.conv4 = nn.ModuleList(conv4)
 
         conv5 = []
         conv5.append(NormDistConv(384, 256, 3, 1, 1, bias=False))
-        conv5.append(BoundReLU(inplace=True))
+        conv5.append(BoundReLU())
         self.conv5 = nn.ModuleList(conv5)
 
         fc = []
