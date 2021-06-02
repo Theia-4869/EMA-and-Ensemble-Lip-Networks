@@ -111,8 +111,8 @@ class NormDistConv(nn.Module):
         self.dilation = dilation
         self.group = group
         self.p = p
-        assert(in_channels % group == 0)
-        assert (out_channels % group == 0)
+        #assert(in_channels % group == 0)
+        #assert(out_channels % group == 0)
 
         weight_tensor = torch.randn(out_channels, in_channels // group, kernel_size, kernel_size)
         if identity_init and in_channels <= out_channels:
