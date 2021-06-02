@@ -23,11 +23,9 @@ class VGGNet(nn.Module):
 
     def _make_layer(in_channel, out_channel, conv_num, pool=True):
         layers = []
-
-        print('start')
+        print('in_channel = ',in_channel)
         layers.append(NormDistConv(in_channels=in_channel, out_channels=out_channel, kernel_size=3, 
                                     stride=1, padding=1, bias=False, mean_normalize=True))
-        print('check')
         layers.append(BoundReLU())
 
         for i in range(conv_num):
