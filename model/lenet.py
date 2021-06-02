@@ -5,7 +5,7 @@ from model.bound_module import BoundReLU, BoundMeanNorm, BoundLinear
 from model.bound_module import BoundMaxPool2d, BoundAvgPool2d, BoundAdaptiveMaxPool2d, BoundAdaptiveAvgPool2d
 
 class LeNet(nn.Module):
-    def __init__(self, num_classes=10):
+    def __init__(self, input_dim, num_classes=10):
         super(LeNet, self).__init__()
         conv1 = []
         conv1.append(NormDistConv(3, 6, 5, bias=False))
@@ -40,7 +40,7 @@ class LeNet(nn.Module):
         return paras
 
 class LeNetFeature(nn.Module):
-    def __init__(self):
+    def __init__(self, input_dim):
         super(LeNetFeature, self).__init__()
         conv1 = []
         conv1.append(NormDistConv(3, 6, 5, bias=False))
