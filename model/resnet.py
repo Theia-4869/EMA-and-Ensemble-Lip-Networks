@@ -138,15 +138,16 @@ model_dict = {
 
 class ResNet(nn.Module):
     """backbone + projection head"""
-    def __init__(self, input_dim, name='resnet50', head='mlp', feat_dim=128, num_classes=10):
+    def __init__(self, input_dim, name='resnet50', head_name='mlp', feat_dim=128, num_classes=10):
         super(ResNet, self).__init__()
         model_fun, dim_in = model_dict[name]
         self.encoder = model_fun()
-        if head == 'linear':
+        head = []
+        if head_name == 'linear':
             head.append(BoundLinear(dim_in, feat_dim, bias=False))
             head.append(BoundReLU())
             head.append(BoundLinear(feat_dim, num_classes))
-        elif head == 'mlp':
+        elif head_name == 'mlp':
             head.append(BoundLinear(dim_in, dim_in, bias=False))
             head.append(BoundReLU())
             head.append(BoundLinear(dim_in, feat_dim, bias=False))
@@ -167,13 +168,14 @@ class ResNet(nn.Module):
 
 class ResNetFeature(nn.Module):
     """backbone + projection head"""
-    def __init__(self, input_dim, name='resnet50', head='mlp', feat_dim=128):
+    def __init__(self, input_dim, name='resnet50', head_name='mlp', feat_dim=128):
         super(ResNetFeature, self).__init__()
         model_fun, dim_in = model_dict[name]
         self.encoder = model_fun()
-        if head == 'linear':
+        head = []
+        if head_name == 'linear':
             head.append(BoundLinear(dim_in, feat_dim, bias=False))
-        elif head == 'mlp':
+        elif head_name == 'mlp':
             head.append(BoundLinear(dim_in, dim_in, bias=False))
             head.append(BoundReLU(inplace=True))
             head.append(BoundLinear(dim_in, feat_dim, bias=False))
