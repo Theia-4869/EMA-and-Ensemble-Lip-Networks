@@ -149,10 +149,13 @@ class ResNet(nn.Module):
             head.append(BoundLinear(feat_dim, num_classes))
         elif head_name == 'mlp':
             head.append(BoundLinear(dim_in, dim_in, bias=False))
+            print(1)
             head.append(BoundReLU())
             head.append(BoundLinear(dim_in, feat_dim, bias=False))
+            print(2)
             head.append(BoundReLU())
             head.append(BoundLinear(feat_dim, num_classes))
+            print(3)
         else:
             raise NotImplementedError(
                 'head not supported: {}'.format(head))
