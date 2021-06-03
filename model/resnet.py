@@ -143,15 +143,15 @@ class ResNet(nn.Module):
         self.encoder = model_fun()
         head = []
         if head_name == 'linear':
-            head.append(BoundLinear(dim_in, feat_dim, bias=False))
+            head.append(NormDist(dim_in, feat_dim, bias=False))
             head.append(BoundReLU())
-            head.append(BoundLinear(feat_dim, num_classes))
+            head.append(NormDist(feat_dim, num_classes))
         elif head_name == 'mlp':
-            head.append(BoundLinear(dim_in, dim_in, bias=False))
+            head.append(NormDist(dim_in, dim_in, bias=False))
             head.append(BoundReLU())
-            head.append(BoundLinear(dim_in, feat_dim, bias=False))
+            head.append(NormDist(dim_in, feat_dim, bias=False))
             head.append(BoundReLU())
-            head.append(BoundLinear(feat_dim, num_classes))
+            head.append(NormDist(feat_dim, num_classes))
         else:
             raise NotImplementedError(
                 'head not supported: {}'.format(head))
@@ -174,11 +174,11 @@ class ResNetFeature(nn.Module):
         self.encoder = model_fun()
         head = []
         if head_name == 'linear':
-            head.append(BoundLinear(dim_in, feat_dim, bias=False))
+            head.append(NormDist(dim_in, feat_dim, bias=False))
         elif head_name == 'mlp':
-            head.append(BoundLinear(dim_in, dim_in, bias=False))
+            head.append(NormDist(dim_in, dim_in, bias=False))
             head.append(BoundReLU(inplace=True))
-            head.append(BoundLinear(dim_in, feat_dim, bias=False))
+            head.append(NormDist(dim_in, feat_dim, bias=False))
         else:
             raise NotImplementedError(
                 'head not supported: {}'.format(head))

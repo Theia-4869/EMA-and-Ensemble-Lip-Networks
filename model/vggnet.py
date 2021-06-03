@@ -14,11 +14,11 @@ class VGGNet(nn.Module):
         self.layer5 = self._make_layer(512, 512, 4, False)
 
         fc = []
-        fc.append(BoundLinear(512 * 2 * 2, 256, bias=False))
+        fc.append(NormDist(512 * 2 * 2, 256, bias=False))
         fc.append(BoundReLU())
-        fc.append(BoundLinear(256, 256, bias=False))
+        fc.append(NormDist(256, 256, bias=False))
         fc.append(BoundReLU())
-        fc.append(BoundLinear(256, num_classes))
+        fc.append(NormDist(256, num_classes))
         self.fc = nn.ModuleList(fc)
 
     def _make_layer(self, in_channel, out_channel, conv_num, pool=True):
@@ -66,9 +66,9 @@ class VGGNetFeature(nn.Module):
         self.layer5 = self._make_layer(512, 512, 4, False)
 
         fc = []
-        fc.append(BoundLinear(512 * 2 * 2, 256, bias=False))
+        fc.append(NormDist(512 * 2 * 2, 256, bias=False))
         fc.append(BoundReLU())
-        fc.append(BoundLinear(256, 256, bias=False))
+        fc.append(NormDist(256, 256, bias=False))
         self.fc = nn.ModuleList(fc)
         self.out_features = 256
 
