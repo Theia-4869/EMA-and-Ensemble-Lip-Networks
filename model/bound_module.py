@@ -120,25 +120,32 @@ class BoundMaxPool2d(nn.MaxPool2d):
         super(BoundMaxPool2d, self).__init__(kernel_size, stride=stride, padding=padding, dilation=dilation, return_indices=return_indices, ceil_mode=ceil_mode)
     def forward(self, x, lower=None, upper=None):
         y = super(BoundMaxPool2d, self).forward(x)
-        return y, lower, upper
-
+        if lower is None or upper is None:
+            return y, None, None
+        return y, super(BoundMaxPool2d, self).forward(lower), super(BoundMaxPool2d, self).forward(upper)
 class BoundAvgPool2d(nn.AvgPool2d):
     def __init__(self, kernel_size, stride=None, padding=0, ceil_mode=False, count_include_pad=True, divisor_override=None):
         super(BoundAvgPool2d, self).__init__(kernel_size, stride=stride, padding=padding, ceil_mode=ceil_mode, count_include_pad=count_include_pad, divisor_override=divisor_override)
     def forward(self, x, lower=None, upper=None):
         y = super(BoundAvgPool2d, self).forward(x)
-        return y, lower, upper
+        if lower is None or upper is None:
+            return y, None, None
+        return y, super(BoundAvgPool2d, self).forward(lower), super(BoundAvgPool2d, self).forward(upper)
 
 class BoundAdaptiveMaxPool2d(nn.AdaptiveMaxPool2d):
     def __init__(self, output_size, return_indices=False):
         super(BoundAdaptiveMaxPool2d, self).__init__(output_size, return_indices=return_indices)
     def forward(self, x, lower=None, upper=None):
         y = super(BoundAdaptiveMaxPool2d, self).forward(x)
-        return y, lower, upper
+        if lower is None or upper is None:
+            return y, None, None
+        return y, super(BoundAdaptiveMaxPool2d, self).forward(lower), super(BoundAdaptiveMaxPool2d, self).forward(upper)
 
 class BoundAdaptiveAvgPool2d(nn.AdaptiveAvgPool2d):
     def __init__(self, output_size):
         super(BoundAdaptiveAvgPool2d, self).__init__(output_size)
     def forward(self, x, lower=None, upper=None):
         y = super(BoundAdaptiveAvgPool2d, self).forward(x)
-        return y, lower, upper
+        if lower is None or upper is None:
+            return y, None, None
+        return y, super(BoundAdaptiveAvgPool2d, self).forward(lower), super(BoundAdaptiveAvgPool2d, self).forward(upper)
