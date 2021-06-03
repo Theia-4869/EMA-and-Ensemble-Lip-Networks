@@ -28,6 +28,8 @@ class LeNet(nn.Module):
         self.fc = nn.ModuleList(fc)
 
     def forward(self, x, lower=None, upper=None):
+        if lower:
+            print('lower is not None.')
         paras = (x, lower, upper)
         for layer in self.conv1:
             paras = layer(*paras)
