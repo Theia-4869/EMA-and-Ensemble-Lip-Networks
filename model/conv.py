@@ -21,6 +21,8 @@ class Conv(nn.Module):
         self.fc = NormDist(pixels * width, hidden, bias=False, mean_normalize=True)
         self.fc_last = NormDist(hidden, num_classes, bias=True, mean_normalize=False)
     def forward(self, x, lower=None, upper=None):
+        if lower:
+            print('lower is not None.')
         paras = (x, lower, upper)
         for layer in self.conv:
             paras = layer(*paras)
