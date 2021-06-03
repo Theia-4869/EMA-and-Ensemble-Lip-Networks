@@ -29,7 +29,8 @@ class LeNet(nn.Module):
 
     def forward(self, x, lower=None, upper=None):
         if lower is not None:
-            print(lower)
+            print(lower.size())
+            print(x.size())
             print('lower is not None.')
         paras = (x, lower, upper)
         for layer in self.conv1:
