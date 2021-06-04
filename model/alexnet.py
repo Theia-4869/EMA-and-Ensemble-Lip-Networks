@@ -35,11 +35,11 @@ class AlexNet(nn.Module):
         self.conv5 = nn.ModuleList(conv5)
 
         fc = []
-        fc.append(NormDist(256 * 3 * 3, 1024, bias=False))
+        fc.append(NormDist(256 * 3 * 3, 1024, bias=False, mean_normalize=True))
         fc.append(BoundReLU())
-        fc.append(NormDist(1024, 512, bias=False))
+        fc.append(NormDist(1024, 512, bias=False, mean_normalize=True))
         fc.append(BoundReLU())
-        fc.append(NormDist(512, num_classes))
+        fc.append(NormDist(512, num_classes, bias=True, mean_normalize=False))
         self.fc = nn.ModuleList(fc)
 
     def forward(self, x, lower=None, upper=None):
@@ -91,9 +91,9 @@ class AlexNetFeature(nn.Module):
         self.conv5 = nn.ModuleList(conv5)
 
         fc = []
-        fc.append(NormDist(256 * 3 * 3, 1024, bias=False))
+        fc.append(NormDist(256 * 3 * 3, 1024, bias=False, mean_normalize=True))
         fc.append(BoundReLU())
-        fc.append(NormDist(1024, 512, bias=False))
+        fc.append(NormDist(1024, 512, bias=False, mean_normalize=True))
         self.fc = nn.ModuleList(fc)
         self.out_features = 512
 
