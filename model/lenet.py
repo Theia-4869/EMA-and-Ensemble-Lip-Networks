@@ -9,21 +9,17 @@ class LeNet(nn.Module):
         super(LeNet, self).__init__()
         conv1 = []
         conv1.append(NormDistConv(3, 6, 5, bias=False))
-        conv1.append(BoundReLU())
         conv1.append(BoundMaxPool2d(2))
         self.conv1 = nn.ModuleList(conv1)
 
         conv2 = []
         conv2.append(NormDistConv(6, 16, 5, bias=False))
-        conv2.append(BoundReLU())
         conv2.append(BoundMaxPool2d(2))
         self.conv2 = nn.ModuleList(conv2)
 
         fc = []
         fc.append(NormDist(16 * 5 * 5, 120, bias=False, mean_normalize=True))
-        fc.append(BoundReLU())
         fc.append(NormDist(120, 84, bias=False, mean_normalize=True))
-        fc.append(BoundReLU())
         fc.append(NormDist(84, num_classes, bias=True, mean_normalize=False))
         self.fc = nn.ModuleList(fc)
 
