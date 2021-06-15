@@ -5,8 +5,10 @@ import os
 import time
 import numpy as np
 import math
+import matplotlib.pyplot as plt
 from collections import OrderedDict
-from utils import random_seed, create_result_dir, Logger, TableLogger, AverageMeter
+
+from utils import random_seed, create_result_dir, plot_grad_flow, Logger, TableLogger, AverageMeter
 from attack import AttackPGD
 from adamw import AdamW
 from madam import Madam
@@ -59,7 +61,7 @@ def parallel_reduce(*argv):
     ret = tensor.cpu() / torch.distributed.get_world_size()
     return ret.tolist()
 
-def train(net, loss_fun, epoch, trainloader, optimizer, schedule, logger, train_logger, gpu, parallel, print_freq):
+def train(net, loss_fun, epoch, trainloader, optimizer, schedule, logger, train_logger, gpu, parallel, print_freq, result_dir):
     if logger is not None:
         logger.print('Epoch %d training start' % (epoch))
     net.train()
@@ -104,6 +106,13 @@ def train(net, loss_fun, epoch, trainloader, optimizer, schedule, logger, train_
                      '   lr {lr:.4f}   p {p:.2f}   eps {eps:.4f}   kappa {kappa:.4f}'.format(
                      epoch, loss=loss, acc=acc, lr=optimizer.param_groups[0]['lr'],
                      p=get_p_norm(net), eps=get_eps(net), kappa=loss_fun.kappa))
+    if epoch % 25 == 0:
+        plot_grad_flow(net.named_parameters())
+        fig_folder = os.path.join(result_dir, 'grad')
+        if not os.path.isdir(fig_folder):
+            os.makedirs(fig_folder)
+        plt.savefig(fname=fig_folder+'/epoch_'+str(epoch)+'.png')
+        
     return loss, acc
 
 @torch.no_grad()
@@ -358,7 +367,7 @@ def main_worker(gpu, parallel, args, result_dir):
         if parallel:
             train_loader.sampler.set_epoch(epoch)
         train_loss, train_acc = train(model, loss, epoch, train_loader, optimizer, schedule,
-                                      logger, train_logger, gpu, parallel, args.print_freq)
+                                      logger, train_logger, gpu, parallel, args.print_freq, result_dir)
         test_loss, test_acc = test(model, loss, epoch, test_loader, logger, test_logger, gpu, parallel, args.print_freq)
         if writer is not None:
             writer.add_scalar('curve/p', get_p_norm(model), epoch)
