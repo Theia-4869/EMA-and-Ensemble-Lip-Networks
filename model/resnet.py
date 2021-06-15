@@ -172,7 +172,6 @@ class ResNetFeature(nn.Module):
             head.append(NormDist(dim_in, feat_dim, bias=False, mean_normalize=True))
         elif head_name == 'mlp':
             head.append(NormDist(dim_in, dim_in, bias=False, mean_normalize=True))
-            head.append(BoundReLU(inplace=True))
             head.append(NormDist(dim_in, feat_dim, bias=False, mean_normalize=True))
         else:
             raise NotImplementedError(

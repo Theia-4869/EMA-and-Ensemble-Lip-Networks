@@ -5,7 +5,7 @@ from model.bound_module import BoundReLU, BoundMeanNorm, BoundLinear
 from model.bound_module import BoundMaxPool2d, BoundAvgPool2d, BoundAdaptiveMaxPool2d, BoundAdaptiveAvgPool2d
 
 class VGGNet(nn.Module):
-    def __init__(self, input_dim, num_classes=10):
+    def __init__(self, input_dim, hidden=512, num_classes=10):
         super(VGGNet, self).__init__()
         self.layer1 = self._make_layer(3, 64, 2)
         self.layer2 = self._make_layer(64, 128, 2)
@@ -15,8 +15,8 @@ class VGGNet(nn.Module):
 
         fc = []
         fc.append(NormDist(512 * 2 * 2, 256, bias=False, mean_normalize=True))
-        fc.append(NormDist(256, 256, bias=False, mean_normalize=True))
-        fc.append(NormDist(256, num_classes, bias=True, mean_normalize=False))
+        fc.append(NormDist(256, hidden, bias=False, mean_normalize=True))
+        fc.append(NormDist(hidden, num_classes, bias=True, mean_normalize=False))
         self.fc = nn.ModuleList(fc)
 
     def _make_layer(self, in_channel, out_channel, conv_num, pool=True):
@@ -53,7 +53,7 @@ class VGGNet(nn.Module):
         return paras
 
 class VGGNetFeature(nn.Module):
-    def __init__(self, input_dim):
+    def __init__(self, input_dim, hidden=512):
         super(VGGNetFeature, self).__init__()
         self.layer1 = self._make_layer(3, 64, 2)
         self.layer2 = self._make_layer(64, 128, 2)
@@ -63,22 +63,19 @@ class VGGNetFeature(nn.Module):
 
         fc = []
         fc.append(NormDist(512 * 2 * 2, 256, bias=False, mean_normalize=True))
-        fc.append(BoundReLU())
-        fc.append(NormDist(256, 256, bias=False, mean_normalize=True))
+        fc.append(NormDist(256, hidden, bias=False, mean_normalize=True))
         self.fc = nn.ModuleList(fc)
-        self.out_features = 256
+        self.out_features = hidden
 
-    def _make_layer(in_channel, out_channel, conv_num, pool=True):
+    def _make_layer(self, in_channel, out_channel, conv_num, pool=True):
         layers = []
 
         layers.append(NormDistConv(in_channels=in_channel, out_channels=out_channel, kernel_size=3, 
                                     stride=1, padding=1, bias=False, mean_normalize=True))
-        layers.append(BoundReLU())
 
         for i in range(conv_num):
             layers.append(NormDistConv(in_channels=out_channel, out_channels=out_channel, kernel_size=3,  
                                         stride=1, padding=1, bias=False, mean_normalize=True))
-            layers.append(BoundReLU())
         
         if pool:
             layers.append(BoundMaxPool2d(2))
