@@ -75,7 +75,6 @@ class resNet(nn.Module):
         self.in_planes = 64
 
         self.conv = NormDistConv(in_channel, 64, kernel_size=3, stride=1, padding=1, bias=False, mean_normalize=True)
-        self.relu = BoundReLU()
         self.layer1 = self._make_layer(block, 64, num_blocks[0], stride=1)
         self.layer2 = self._make_layer(block, 128, num_blocks[1], stride=2)
         self.layer3 = self._make_layer(block, 256, num_blocks[2], stride=2)
@@ -98,7 +97,6 @@ class resNet(nn.Module):
     def forward(self, x, lower=None, upper=None):
         paras = (x, lower, upper)
         paras = self.conv(*paras)
-        paras = self.relu(*paras)
         for layer in self.layer1:
             paras = layer(*paras)
         for layer in self.layer2:
@@ -144,13 +142,10 @@ class ResNet(nn.Module):
         head = []
         if head_name == 'linear':
             head.append(NormDist(dim_in, feat_dim, bias=False, mean_normalize=True))
-            head.append(BoundReLU())
             head.append(NormDist(feat_dim, num_classes, bias=True, mean_normalize=False))
         elif head_name == 'mlp':
             head.append(NormDist(dim_in, dim_in, bias=False, mean_normalize=True))
-            head.append(BoundReLU())
             head.append(NormDist(dim_in, feat_dim, bias=False, mean_normalize=True))
-            head.append(BoundReLU())
             head.append(NormDist(feat_dim, num_classes, bias=True, mean_normalize=False))
         else:
             raise NotImplementedError(
