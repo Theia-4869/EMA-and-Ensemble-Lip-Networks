@@ -28,6 +28,7 @@ parser.add_argument('--eps-train', default=None, type=float)
 parser.add_argument('--eps-test', default=None, type=float)
 
 parser.add_argument('-b', '--batch-size', default=256, type=int)
+parser.add_argument('-opt', '--optimizer', default='adamw', type=str)
 parser.add_argument('--lr', default=0.01, type=float)
 parser.add_argument('--beta1', default=0.9, type=float)
 parser.add_argument('--beta2', default=0.99, type=float)
@@ -312,8 +313,11 @@ def main_worker(gpu, parallel, args, result_dir):
     else:
         logger = train_logger = test_logger = None
     
-    optimizer = Madam(model, lr=args.lr)
-    # optimizer = AdamW(model, lr=args.lr, weight_decay=args.wd, betas=(args.beta1,args.beta2), eps=args.epsilon)
+    if args.optimizer == 'adamw':
+        optimizer = AdamW(model, lr=args.lr, weight_decay=args.wd, betas=(args.beta1,args.beta2), eps=args.epsilon)
+    elif args.optimizer == 'madam':
+        optimizer = Madam(model, lr=args.lr)
+    
 
     if args.checkpoint:
         assert os.path.isfile(args.checkpoint)
