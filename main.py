@@ -9,6 +9,7 @@ from collections import OrderedDict
 from utils import random_seed, create_result_dir, Logger, TableLogger, AverageMeter
 from attack import AttackPGD
 from adamw import AdamW
+from madam import Madam
 from model.model import Model, set_eps, get_eps
 from model.norm_dist import set_p_norm, get_p_norm
 
@@ -310,8 +311,9 @@ def main_worker(gpu, parallel, args, result_dir):
         test_logger = TableLogger(os.path.join(result_dir, 'test.log'), ['epoch', 'loss', 'acc'])
     else:
         logger = train_logger = test_logger = None
-
-    optimizer = AdamW(model, lr=args.lr, weight_decay=args.wd, betas=(args.beta1,args.beta2), eps=args.epsilon)
+    
+    optimizer = Madam(model, lr=args.lr)
+    # optimizer = AdamW(model, lr=args.lr, weight_decay=args.wd, betas=(args.beta1,args.beta2), eps=args.epsilon)
 
     if args.checkpoint:
         assert os.path.isfile(args.checkpoint)
