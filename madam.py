@@ -5,13 +5,16 @@ from torch.optim.optimizer import Optimizer
 
 class Madam(Optimizer):
 
-    def __init__(self, params, lr=0.01, p_scale=3.0, g_bound=10.0):
-
+    def __init__(self, model, lr=0.01, p_scale=3.0, g_bound=10.0):
+        if not 0.0 <= lr:
+            raise ValueError("Invalid learning rate: {}".format(lr))
         self.p_scale = p_scale
         self.g_bound = g_bound
         defaults = dict(lr=lr)
+        params = [{'params': p, 'module': m} for m in model.modules() for p in m.parameters(False)]
         super(Madam, self).__init__(params, defaults)
 
+    @torch.no_grad()
     def step(self, closure=None):
         """Performs a single optimization step.
         Arguments:
@@ -20,7 +23,8 @@ class Madam(Optimizer):
         """
         loss = None
         if closure is not None:
-            loss = closure()
+            with torch.enable_grad():
+                loss = closure()
 
         for group in self.param_groups:
             for p in group['params']:
