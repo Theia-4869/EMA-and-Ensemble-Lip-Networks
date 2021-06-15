@@ -182,6 +182,7 @@ class ResNetFeature(nn.Module):
     def forward(self, x, lower=None, upper=None):
         paras = (x, lower, upper)
         paras = self.encoder(*paras)
+        paras = [None if y is None else y.view(y.size(0), -1) for y in paras]
         for layer in self.head:
             paras = layer(*paras)
         return paras
