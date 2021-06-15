@@ -5,7 +5,7 @@ from model.bound_module import BoundReLU, BoundMeanNorm, BoundLinear
 from model.bound_module import BoundMaxPool2d, BoundAvgPool2d, BoundAdaptiveMaxPool2d, BoundAdaptiveAvgPool2d
 
 class LeNet(nn.Module):
-    def __init__(self, input_dim, num_classes=10):
+    def __init__(self, input_dim, hidden=512, num_classes=10):
         super(LeNet, self).__init__()
         conv1 = []
         conv1.append(NormDistConv(3, 6, 5, bias=False))
@@ -19,8 +19,8 @@ class LeNet(nn.Module):
 
         fc = []
         fc.append(NormDist(16 * 5 * 5, 120, bias=False, mean_normalize=True))
-        fc.append(NormDist(120, 84, bias=False, mean_normalize=True))
-        fc.append(NormDist(84, num_classes, bias=True, mean_normalize=False))
+        fc.append(NormDist(120, hidden, bias=False, mean_normalize=True))
+        fc.append(NormDist(hidden, num_classes, bias=True, mean_normalize=False))
         self.fc = nn.ModuleList(fc)
 
     def forward(self, x, lower=None, upper=None):
@@ -36,7 +36,7 @@ class LeNet(nn.Module):
         return paras
 
 class LeNetFeature(nn.Module):
-    def __init__(self, input_dim):
+    def __init__(self, input_dim, hidden=512):
         super(LeNetFeature, self).__init__()
         conv1 = []
         conv1.append(NormDistConv(3, 6, 5, bias=False))
@@ -50,9 +50,9 @@ class LeNetFeature(nn.Module):
 
         fc = []
         fc.append(NormDist(16 * 5 * 5, 120, bias=False, mean_normalize=True))
-        fc.append(NormDist(120, 84, bias=False, mean_normalize=True))
+        fc.append(NormDist(120, hidden, bias=False, mean_normalize=True))
         self.fc = nn.ModuleList(fc)
-        self.out_features = 84
+        self.out_features = hidden
 
     def forward(self, x, lower=None, upper=None):
         paras = (x, lower, upper)
