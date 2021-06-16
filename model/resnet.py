@@ -22,9 +22,12 @@ class BasicBlock(nn.Module):
         out1 = self.conv1(*paras)
         out1 = self.conv2(*out1)
         out2 = paras
-        if self.shortcut:
+        if self.shortcut is not None:
             out2 = self.shortcut(*out2)
-        out = (out1[0] + out2[0], out1[1], out1[2])
+        if out1[1] is None or out1[2] is None or out2[1] is None or out2[2] is None:
+            out = (out1[0] + out2[0], None, None)
+        else:
+            out = (out1[0] + out2[0], out1[1] + out2[1], out1[2] + out2[2])
         return out
 
 
@@ -47,9 +50,12 @@ class Bottleneck(nn.Module):
         out1 = self.conv2(*out1)
         out1 = self.conv3(*out1)
         out2 = paras
-        if self.shortcut:
+        if self.shortcut is not None:
             out2 = self.shortcut(*out2)
-        out = (out1[0] + out2[0], out1[1], out1[2])
+        if out1[1] is None or out1[2] is None or out2[1] is None or out2[2] is None:
+            out = (out1[0] + out2[0], None, None)
+        else:
+            out = (out1[0] + out2[0], out1[1] + out2[1], out1[2] + out2[2])
         return out
 
 
@@ -64,10 +70,6 @@ class resNet(nn.Module):
         self.layer3 = self._make_layer(block, 256, num_blocks[2], stride=2)
         self.layer4 = self._make_layer(block, 512, num_blocks[3], stride=2)
         self.avgpool = BoundAdaptiveAvgPool2d((1, 1))
-
-        for m in self.modules():
-            if isinstance(m, NormDistConv):
-                nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
 
     def _make_layer(self, block, planes, num_blocks, stride):
         strides = [stride] + [1] * (num_blocks - 1)
@@ -119,7 +121,7 @@ model_dict = {
 
 class ResNet(nn.Module):
     """backbone + projection head"""
-    def __init__(self, input_dim, name='resnet50', head_name='mlp', feat_dim=128, num_classes=10):
+    def __init__(self, input_dim, name='resnet50', head_name='mlp', feat_dim=512, num_classes=10):
         super(ResNet, self).__init__()
         model_fun, dim_in = model_dict[name]
         self.encoder = model_fun()
@@ -147,7 +149,7 @@ class ResNet(nn.Module):
 
 class ResNetFeature(nn.Module):
     """backbone + projection head"""
-    def __init__(self, input_dim, name='resnet50', head_name='mlp', feat_dim=128):
+    def __init__(self, input_dim, name='resnet50', head_name='mlp', feat_dim=512):
         super(ResNetFeature, self).__init__()
         model_fun, dim_in = model_dict[name]
         self.encoder = model_fun()
