@@ -8,31 +8,30 @@ class AlexNet(nn.Module):
     def __init__(self, input_dim, hidden=512, num_classes=10):
         super(AlexNet, self).__init__()
         conv1 = []
-        conv1.append(NormDistConv(3, 64, 3, 2, 1, bias=False, mean_normalize=True))
+        conv1.append(NormDistConv(3, 96, 7, 2, 2, bias=False, mean_normalize=True))
         conv1.append(BoundMaxPool2d(3, 2, 0))
         self.conv1 = nn.ModuleList(conv1)
 
         conv2 = []
-        conv2.append(NormDistConv(64, 192, 5, 1, 2, bias=False, mean_normalize=True))
+        conv2.append(NormDistConv(96, 256, 5, 1, 2, bias=False, mean_normalize=True))
         conv2.append(BoundMaxPool2d(3, 2, 0))
         self.conv2 = nn.ModuleList(conv2)
 
         conv3 = []
-        conv3.append(NormDistConv(192, 384, 3, 1, 1, bias=False, mean_normalize=True))
+        conv3.append(NormDistConv(256, 384, 3, 1, 1, bias=False, mean_normalize=True))
         self.conv3 = nn.ModuleList(conv3)
 
         conv4 = []
-        conv4.append(NormDistConv(384, 256, 3, 1, 1, bias=False, mean_normalize=True))
+        conv4.append(NormDistConv(384, 384, 3, 1, 1, bias=False, mean_normalize=True))
         self.conv4 = nn.ModuleList(conv4)
 
         conv5 = []
-        conv5.append(NormDistConv(256, 256, 3, 1, 1, bias=False, mean_normalize=True))
-        conv5.append(BoundMaxPool2d(3, 2, 0))
+        conv5.append(NormDistConv(384, 256, 3, 1, 1, bias=False, mean_normalize=True))
         self.conv5 = nn.ModuleList(conv5)
 
         fc = []
-        fc.append(NormDist(256 * 1 * 1, 4096, bias=False, mean_normalize=True))
-        fc.append(NormDist(4096, hidden, bias=False, mean_normalize=True))
+        fc.append(NormDist(256 * 3 * 3, 1024, bias=False, mean_normalize=True))
+        fc.append(NormDist(1024, hidden, bias=False, mean_normalize=True))
         fc.append(NormDist(hidden, num_classes, bias=True, mean_normalize=False))
         self.fc = nn.ModuleList(fc)
 
