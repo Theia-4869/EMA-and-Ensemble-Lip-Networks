@@ -8,9 +8,8 @@ from model.bound_module import BoundMaxPool2d, BoundAvgPool2d, BoundAdaptiveMaxP
 class BasicBlock(nn.Module):
     expansion = 1
 
-    def __init__(self, in_planes, planes, stride=1, is_last=False):
+    def __init__(self, in_planes, planes, stride=1):
         super(BasicBlock, self).__init__()
-        self.is_last = is_last
         self.conv1 = NormDistConv(in_planes, planes, kernel_size=3, stride=stride, padding=1, bias=False, mean_normalize=True)
         self.conv2 = NormDistConv(planes, planes, kernel_size=3, stride=1, padding=1, bias=False, mean_normalize=True)
 
@@ -18,30 +17,22 @@ class BasicBlock(nn.Module):
         if stride != 1 or in_planes != self.expansion * planes:
             self.shortcut = NormDistConv(in_planes, self.expansion * planes, kernel_size=1, stride=stride, bias=False, mean_normalize=True)
 
-        self.relu = BoundReLU()
-
     def forward(self, x, lower=None, upper=None):
         paras = (x, lower, upper)
-        out1 = self.relu(*self.conv1(*paras))
+        out1 = self.conv1(*paras)
         out1 = self.conv2(*out1)
         out2 = paras
         if self.shortcut:
             out2 = self.shortcut(*out2)
         out = (out1[0] + out2[0], out1[1], out1[2])
-        preact = out
-        out = self.relu(*out)
-        if self.is_last:
-            return out, preact
-        else:
-            return out
+        return out
 
 
 class Bottleneck(nn.Module):
     expansion = 4
 
-    def __init__(self, in_planes, planes, stride=1, is_last=False):
+    def __init__(self, in_planes, planes, stride=1):
         super(Bottleneck, self).__init__()
-        self.is_last = is_last
         self.conv1 = NormDistConv(in_planes, planes, kernel_size=1, bias=False, mean_normalize=True)
         self.conv2 = NormDistConv(planes, planes, kernel_size=3, stride=stride, padding=1, bias=False, mean_normalize=True)
         self.conv3 = NormDistConv(planes, self.expansion * planes, kernel_size=1, bias=False, mean_normalize=True)
@@ -50,27 +41,20 @@ class Bottleneck(nn.Module):
         if stride != 1 or in_planes != self.expansion * planes:
             self.shortcut = NormDistConv(in_planes, self.expansion * planes, kernel_size=1, stride=stride, bias=False, mean_normalize=True)
 
-        self.relu = BoundReLU()
-
     def forward(self, x, lower=None, upper=None):
         paras = (x, lower, upper)
-        out1 = self.relu(*self.conv1(*paras))
-        out1 = self.relu(*self.conv2(*out1))
+        out1 = self.conv1(*paras)
+        out1 = self.conv2(*out1)
         out1 = self.conv3(*out1)
         out2 = paras
         if self.shortcut:
             out2 = self.shortcut(*out2)
         out = (out1[0] + out2[0], out1[1], out1[2])
-        preact = out
-        out = self.relu(*out)
-        if self.is_last:
-            return out, preact
-        else:
-            return out
+        return out
 
 
 class resNet(nn.Module):
-    def __init__(self, block, num_blocks, in_channel=3, zero_init_residual=False):
+    def __init__(self, block, num_blocks, in_channel=3):
         super(resNet, self).__init__()
         self.in_planes = 64
 
