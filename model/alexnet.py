@@ -27,10 +27,11 @@ class AlexNet(nn.Module):
 
         conv5 = []
         conv5.append(NormDistConv(256, 256, 3, 1, 1, bias=False))
+        conv5.append(BoundMaxPool2d(3, 2, 0))
         self.conv5 = nn.ModuleList(conv5)
 
         fc = []
-        fc.append(NormDist(256 * 3 * 3, 4096, bias=False, mean_normalize=True))
+        fc.append(NormDist(256 * 1 * 1, 4096, bias=False, mean_normalize=True))
         fc.append(NormDist(4096, hidden, bias=False, mean_normalize=True))
         fc.append(NormDist(hidden, num_classes, bias=True, mean_normalize=False))
         self.fc = nn.ModuleList(fc)
