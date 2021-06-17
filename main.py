@@ -112,7 +112,7 @@ def train(net, loss_fun, epoch, trainloader, optimizer, schedule, logger, train_
         if not os.path.isdir(fig_folder):
             os.makedirs(fig_folder)
         plt.savefig(fname=fig_folder+'/epoch_'+str(epoch)+'.png')
-        
+
     return loss, acc
 
 @torch.no_grad()
@@ -291,6 +291,7 @@ def main_worker(gpu, parallel, args, result_dir):
     from model.conv import ConvFeature, Conv
     from model.lenet import LeNetFeature, LeNet
     from model.alexnet import AlexNetFeature, AlexNet
+    from model.alexnet2 import AlexNetFeature2, AlexNet2
     from model.vggnet import VGGNetFeature, VGGNet
     from model.resnet import ResNetFeature, ResNet
     model_name, params = parse_function_call(args.model)
