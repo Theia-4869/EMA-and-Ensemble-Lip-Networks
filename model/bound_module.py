@@ -106,10 +106,12 @@ class Predictor(nn.Module):
     def __init__(self, in_features, hidden, out_dim):
         super(Predictor, self).__init__()
         self.fc1 = BoundLinear(in_features, hidden, bias=True)
+        self.relu = BoundReLU()
         self.fc2 = BoundFinalLinear(hidden, out_dim)
     def forward(self, x, lower=None, upper=None, targets=None):
         ret = x, lower, upper
         ret = self.fc1(*ret)
+        ret = self.relu(*ret)
         ret = self.fc2(*ret, targets=targets)
         return ret
 
