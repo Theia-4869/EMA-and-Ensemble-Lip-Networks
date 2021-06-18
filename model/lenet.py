@@ -1,7 +1,7 @@
 import torch.nn as nn
 
 from model.norm_dist import NormDistConv, NormDist
-from model.bound_module import BoundReLU, BoundMeanNorm, BoundLinear
+from model.bound_module import BoundReLU, BoundTanh, BoundMeanNorm, BoundLinear, BoundFinalLinear
 from model.bound_module import BoundMaxPool2d, BoundAvgPool2d, BoundAdaptiveMaxPool2d, BoundAdaptiveAvgPool2d
 
 class LeNet(nn.Module):
@@ -19,7 +19,9 @@ class LeNet(nn.Module):
 
         fc = []
         fc.append(NormDist(16 * 5 * 5, 120, bias=False, mean_normalize=True))
+        fc.append(BoundTanh())
         fc.append(NormDist(120, hidden, bias=False, mean_normalize=True))
+        fc.append(BoundTanh())
         fc.append(NormDist(hidden, num_classes, bias=True, mean_normalize=False))
         self.fc = nn.ModuleList(fc)
 
@@ -50,6 +52,7 @@ class LeNetFeature(nn.Module):
 
         fc = []
         fc.append(NormDist(16 * 5 * 5, 120, bias=False, mean_normalize=True))
+        fc.append(BoundTanh())
         fc.append(NormDist(120, hidden, bias=False, mean_normalize=True))
         self.fc = nn.ModuleList(fc)
         self.out_features = hidden
