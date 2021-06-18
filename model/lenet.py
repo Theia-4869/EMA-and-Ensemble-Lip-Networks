@@ -20,7 +20,7 @@ class LeNet(nn.Module):
         fc = []
         fc.append(BoundLinear(16 * 5 * 5, 120))
         fc.append(BoundLinear(120, hidden))
-        fc.append(BoundFinalLinear(hidden, num_classes))
+        fc.append(BoundLinear(hidden, num_classes))
         self.fc = nn.ModuleList(fc)
 
     def forward(self, x, lower=None, upper=None):
