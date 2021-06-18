@@ -18,9 +18,9 @@ class LeNet(nn.Module):
         self.conv2 = nn.ModuleList(conv2)
 
         fc = []
-        fc.append(BoundLinear(16 * 5 * 5, 120))
-        fc.append(BoundLinear(120, hidden))
-        fc.append(BoundLinear(hidden, num_classes))
+        fc.append(NormDist(16 * 5 * 5, 120, bias=False, mean_normalize=True))
+        fc.append(NormDist(120, hidden, bias=False, mean_normalize=True))
+        fc.append(NormDist(hidden, num_classes, bias=True, mean_normalize=False))
         self.fc = nn.ModuleList(fc)
 
     def forward(self, x, lower=None, upper=None):
@@ -49,8 +49,8 @@ class LeNetFeature(nn.Module):
         self.conv2 = nn.ModuleList(conv2)
 
         fc = []
-        fc.append(BoundLinear(16 * 5 * 5, 120))
-        fc.append(BoundLinear(120, hidden))
+        fc.append(NormDist(16 * 5 * 5, 120, bias=False, mean_normalize=True))
+        fc.append(NormDist(120, hidden, bias=False, mean_normalize=True))
         self.fc = nn.ModuleList(fc)
         self.out_features = hidden
 
