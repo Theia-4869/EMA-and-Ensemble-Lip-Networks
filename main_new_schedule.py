@@ -429,7 +429,7 @@ def main_worker(gpu, parallel, args, result_dir):
                 logger.print("Generate adversarial examples on test dataset")
             gen_adv_examples(model, attacker, test_loader, gpu, parallel, logger)
             certified_test(model, args.eps_test, up, down, epoch, test_loader, logger, gpu, parallel)
-        if epoch == 50 or 80:
+        if epoch == 50 or epoch == 80:
             torch.save({
                 'state_dict': model.state_dict(),
                 'optimizer': optimizer.state_dict(),
