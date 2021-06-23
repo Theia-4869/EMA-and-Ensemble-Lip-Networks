@@ -433,7 +433,7 @@ def main_worker(gpu, parallel, args, result_dir):
                 'state_dict': model.state_dict(),
                 'optimizer': optimizer.state_dict(),
             }, os.path.join(result_dir, 'model'+str(epoch)+'.pth'))
-        if epoch >= 100 and epoch % 20 == 0:
+        if epoch >= 100 and epoch % 50 == 0:
             torch.save({
                 'state_dict': model.state_dict(),
                 'optimizer': optimizer.state_dict(),
