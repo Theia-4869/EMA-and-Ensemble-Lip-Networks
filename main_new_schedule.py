@@ -245,6 +245,11 @@ def create_schedule(args, batch_per_epoch, model, loss, optimizer):
             param_group['lr'] = lr_now
 
         ratio = min(max(num_batches(epoch - epoch1, minibatch) / num_batches(epoch3 - epoch1), 0), 1)
+        if epoch >= 100:
+            p_norm = 9
+        else:
+            p_norm = args.p_start
+        set_p_norm(model, p_norm)
 
         if epoch2 > 0:
             ratio = min(max(num_batches(epoch - epoch0, minibatch) / num_batches(epoch2), 0), 1)
@@ -252,8 +257,6 @@ def create_schedule(args, batch_per_epoch, model, loss, optimizer):
             ratio = 1.0
         set_eps(model, args.eps_train * ratio)
         loss.kappa = args.kappa
-        if epoch >= 100:
-            set_p_norm(model, 9)
 
     def schedule(epoch, minibatch):
         ratio = max(num_batches(epoch - epoch1, minibatch) / num_batches(tot_epoch - epoch1), 0)
