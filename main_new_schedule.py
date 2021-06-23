@@ -238,8 +238,7 @@ def create_schedule(args, batch_per_epoch, model, loss, optimizer):
         return epoch * batch_per_epoch + minibatch
 
     def new_schedule(epoch, minibatch):
-        ratio = max(num_batches(epoch - epoch1, minibatch) /
-                    num_batches(tot_epoch - epoch1), 0)
+        ratio = max(num_batches(epoch - epoch1, minibatch) / num_batches(tot_epoch - epoch1), 0)
         lr_now = 0.5 * args.lr * (1 + math.cos((ratio * math.pi)))
         for param_group in optimizer.param_groups:
             param_group['lr'] = lr_now
