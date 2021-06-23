@@ -22,22 +22,16 @@ train_transforms = {
     'FashionMNIST': [transforms.RandomCrop(28, padding=1)],
     # 'CIFAR10': [transforms.RandomCrop(32, padding=4), transforms.RandomHorizontalFlip()],
     # 'CIFAR100': [transforms.RandomCrop(32, padding=4), transforms.RandomHorizontalFlip()],
-    'CIFAR10':transforms.Compose([
-        transforms.RandomResizedCrop(size=32, scale=(0.2, 1.)),
+    'CIFAR10':[transforms.RandomResizedCrop(size=32, scale=(0.2, 1.)),
         transforms.RandomHorizontalFlip(),
-        transforms.RandomApply([
-            transforms.ColorJitter(0.4, 0.4, 0.4, 0.1)
-        ], p=0.8),
+        transforms.RandomApply([transforms.ColorJitter(0.4, 0.4, 0.4, 0.1)], p=0.8),
         transforms.RandomGrayscale(p=0.2),
-    ]),
-    'CIFAR100':transforms.Compose([
-        transforms.RandomResizedCrop(size=32, scale=(0.2, 1.)),
+    ],
+    'CIFAR100':[transforms.RandomResizedCrop(size=32, scale=(0.2, 1.)),
         transforms.RandomHorizontalFlip(),
-        transforms.RandomApply([
-            transforms.ColorJitter(0.4, 0.4, 0.4, 0.1)
-        ], p=0.8),
+        transforms.RandomApply([transforms.ColorJitter(0.4, 0.4, 0.4, 0.1)], p=0.8),
         transforms.RandomGrayscale(p=0.2),
-    ]),
+    ],
 }
 input_dim = {
     'MNIST': np.array([1, 28, 28]),
