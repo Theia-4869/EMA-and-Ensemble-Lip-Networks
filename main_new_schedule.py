@@ -93,10 +93,10 @@ def train(net, loss_fun, epoch, trainloader, optimizer, schedule, logger, train_
                          'lr {lr:.4f}\tp {p:.2f}\teps {eps:.4f}\tkappa{kappa:.4f}\t'
                          'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
                          'Acc {acc.val:.4f} ({acc.avg:.4f})\t'.format(
-                         epoch, batch_idx + 1, train_loader_len, batch_time=batch_time,
-                         lr=optimizer.param_groups[0]['lr'],
-                         p=get_p_norm(net), eps=get_eps(net), kappa=loss_fun.kappa,
-                         loss=losses, acc=accs))
+                             epoch, batch_idx + 1, train_loader_len, batch_time=batch_time,
+                             lr=optimizer.param_groups[0]['lr'],
+                             p=get_p_norm(net), eps=get_eps(net), kappa=loss_fun.kappa,
+                             loss=losses, acc=accs))
         start = time.time()
 
     loss, acc = losses.avg, accs.avg
@@ -107,8 +107,8 @@ def train(net, loss_fun, epoch, trainloader, optimizer, schedule, logger, train_
     if logger is not None:
         logger.print('Epoch {0}:  train loss {loss:.4f}   acc {acc:.4f}'
                      '   lr {lr:.4f}   p {p:.2f}   eps {eps:.4f}   kappa {kappa:.4f}'.format(
-                     epoch, loss=loss, acc=acc, lr=optimizer.param_groups[0]['lr'],
-                     p=get_p_norm(net), eps=get_eps(net), kappa=loss_fun.kappa))
+                         epoch, loss=loss, acc=acc, lr=optimizer.param_groups[0]['lr'],
+                         p=get_p_norm(net), eps=get_eps(net), kappa=loss_fun.kappa))
     if epoch % 25 == 0:
         plot_grad_flow(net.named_parameters())
         fig_folder = os.path.join(result_dir, 'grad')
@@ -140,7 +140,7 @@ def test(net, loss_fun, epoch, testloader, logger, test_logger, gpu, parallel, p
                          'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
                          'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
                          'Acc {acc.val:.4f} ({acc.avg:.4f})\t'.format(
-                         batch_idx + 1, test_loader_len, batch_time=batch_time, loss=losses, acc=accs))
+                             batch_idx + 1, test_loader_len, batch_time=batch_time, loss=losses, acc=accs))
 
     loss, acc = losses.avg, accs.avg
     if parallel:
@@ -170,7 +170,7 @@ def gen_adv_examples(model, attacker, test_loader, gpu, parallel, logger, fast=F
                 result &= (predicted == targets)
         correct += result.float().sum().item()
         tot_num += inputs.size(0)
-        if fast and batch_idx * 10 >= size: 
+        if fast and batch_idx * 10 >= size:
             break
 
     acc = correct / tot_num * 100
@@ -237,6 +237,26 @@ def create_schedule(args, batch_per_epoch, model, loss, optimizer):
     def num_batches(epoch, minibatch=0):
         return epoch * batch_per_epoch + minibatch
 
+    def new_schedule(epoch, minibatch):
+        ratio = max(num_batches(epoch - epoch1, minibatch) /
+                    num_batches(tot_epoch - epoch1), 0)
+        lr_now = 0.5 * args.lr * (1 + math.cos((ratio * math.pi)))
+        for param_group in optimizer.param_groups:
+            param_group['lr'] = lr_now
+
+        ratio = min(max(num_batches(epoch - epoch1, minibatch) /
+                    num_batches(epoch3 - epoch1), 0), 1)
+
+        if epoch2 > 0:
+            ratio = min(
+                max(num_batches(epoch - epoch0, minibatch) / num_batches(epoch2), 0), 1)
+        else:
+            ratio = 1.0
+        set_eps(model, args.eps_train * ratio)
+        loss.kappa = args.kappa
+        if epoch >= 100:
+            set_p_norm(model, 9)
+
     def schedule(epoch, minibatch):
         ratio = max(num_batches(epoch - epoch1, minibatch) / num_batches(tot_epoch - epoch1), 0)
         lr_now = 0.5 * args.lr * (1 + math.cos((ratio * math.pi)))
@@ -257,7 +277,7 @@ def create_schedule(args, batch_per_epoch, model, loss, optimizer):
         set_eps(model, args.eps_train * ratio)
         loss.kappa = args.kappa
 
-    return schedule
+    return new_schedule
 
 
 import torch.nn.functional as F
@@ -337,7 +357,7 @@ def main_worker(gpu, parallel, args, result_dir):
         test_logger = TableLogger(os.path.join(result_dir, 'test.log'), ['epoch', 'loss', 'acc'])
     else:
         logger = train_logger = test_logger = None
-    
+
     if args.optimizer == 'adamw':
         optimizer = AdamW(model, lr=args.lr, weight_decay=args.wd, betas=(args.beta1, args.beta2), eps=args.epsilon)
     elif args.optimizer == 'madam':
@@ -376,7 +396,7 @@ def main_worker(gpu, parallel, args, result_dir):
     if args.visualize and output_flag:
         from torch.utils.tensorboard import SummaryWriter
         writer = SummaryWriter(result_dir)
-    else: 
+    else:
         writer = None
 
     for epoch in range(args.start_epoch, args.epochs[-1]):
@@ -408,7 +428,16 @@ def main_worker(gpu, parallel, args, result_dir):
                 logger.print("Generate adversarial examples on test dataset")
             gen_adv_examples(model, attacker, test_loader, gpu, parallel, logger)
             certified_test(model, args.eps_test, up, down, epoch, test_loader, logger, gpu, parallel)
-
+        if epoch == 50 or 80:
+            torch.save({
+                'state_dict': model.state_dict(),
+                'optimizer': optimizer.state_dict(),
+            }, os.path.join(result_dir, 'model'+str(epoch)+'.pth'))
+        if epoch >= 100 and epoch % 20 == 0:
+            torch.save({
+                'state_dict': model.state_dict(),
+                'optimizer': optimizer.state_dict(),
+            }, os.path.join(result_dir, 'model'+str(epoch)+'.pth'))
     schedule(args.epochs[-1], 0)
     if output_flag:
         logger.print("Calculate certified accuracy on training dataset and test dataset")
@@ -422,6 +451,7 @@ def main_worker(gpu, parallel, args, result_dir):
         }, os.path.join(result_dir, 'model.pth'))
     if writer is not None:
         writer.close()
+
 
 def main(father_handle, **extra_argv):
     args = parser.parse_args()
