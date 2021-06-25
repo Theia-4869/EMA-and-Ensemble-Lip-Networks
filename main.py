@@ -326,7 +326,7 @@ def main_worker(gpu, parallel, args, result_dir):
         model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[gpu])
     
     from utils import EMA
-    ema = EMA(model, 0.99)
+    ema = EMA(model, 0.999)
     ema.register()
 
     loss_name, params = parse_function_call(args.loss)
