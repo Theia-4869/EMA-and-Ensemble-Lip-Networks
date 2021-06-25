@@ -106,13 +106,16 @@ class Predictor(nn.Module):
     def __init__(self, in_features, hidden, out_dim):
         super(Predictor, self).__init__()
         self.fc1 = BoundLinear(in_features, hidden, bias=True)
+        self.fc2 = BoundLinear(hidden, hidden, bias=True)
+        self.fc3 = BoundFinalLinear(hidden, out_dim)
         self.tanh = BoundTanh()
-        self.fc2 = BoundFinalLinear(hidden, out_dim)
     def forward(self, x, lower=None, upper=None, targets=None):
         ret = x, lower, upper
         ret = self.fc1(*ret)
         ret = self.tanh(*ret)
-        ret = self.fc2(*ret, targets=targets)
+        ret = self.fc2(*ret)
+        ret = self.tanh(*ret)
+        ret = self.fc3(*ret, targets=targets)
         return ret
 
 class BoundMaxPool2d(nn.MaxPool2d):
