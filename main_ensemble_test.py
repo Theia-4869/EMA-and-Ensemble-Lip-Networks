@@ -254,8 +254,8 @@ def main_worker(gpu, parallel, args, result_dir):
             logger.print(arg, '=', getattr(args, arg))
         logger.print(train_loader.dataset.transform)
         for m in model_list:
-            logger.print(model)
-            logger.print('number of params: ', sum([p.numel() for p in model.parameters()]))
+            logger.print(m)
+            logger.print('number of params: ', sum([p.numel() for p in m.parameters()]))
         logger.print('Using loss', loss)
         test_logger = TableLogger(os.path.join(result_dir, 'test.log'), ['loss', 'acc'])
     else:
