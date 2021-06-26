@@ -304,18 +304,18 @@ def main_worker(gpu, parallel, args, result_dir):
     else: 
         writer = None
     
-    if logger is not None:
-        logger.print("Calculate test accuracy on test dataset")
-    test_loss, test_acc = ensemble_test(model_list, weight_list, loss, test_loader, logger, test_logger, gpu, parallel, args.print_freq)
-    writer.add_scalar('curve/p', get_p_norm(model), 0)
-    writer.add_scalar('curve/test loss', test_loss, 0)
-    writer.add_scalar('curve/test acc', test_acc, 0)
-
     # if logger is not None:
-    #     logger.print("Generate adversarial examples on test dataset")
-    # robust_test_acc = ensemble_gen_adv_examples(model_list, weight_list, attacker_list, test_loader, gpu, parallel, logger, fast=True)
-    # if writer is not None:
-    #     writer.add_scalar('curve/robust test acc', robust_test_acc, 0)
+    #     logger.print("Calculate test accuracy on test dataset")
+    # test_loss, test_acc = ensemble_test(model_list, weight_list, loss, test_loader, logger, test_logger, gpu, parallel, args.print_freq)
+    # writer.add_scalar('curve/p', get_p_norm(model), 0)
+    # writer.add_scalar('curve/test loss', test_loss, 0)
+    # writer.add_scalar('curve/test acc', test_acc, 0)
+
+    if logger is not None:
+        logger.print("Generate adversarial examples on test dataset")
+    robust_test_acc = ensemble_gen_adv_examples(model_list, weight_list, attacker_list, test_loader, gpu, parallel, logger, fast=True)
+    if writer is not None:
+        writer.add_scalar('curve/robust test acc', robust_test_acc, 0)
     
     if logger is not None:
         logger.print("Calculate certified accuracy on test dataset")
