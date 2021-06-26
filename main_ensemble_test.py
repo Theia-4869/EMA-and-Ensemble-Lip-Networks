@@ -305,7 +305,7 @@ def main_worker(gpu, parallel, args, result_dir):
 
     if logger is not None:
         logger.print("Generate adversarial examples on test dataset")
-    robust_test_acc = ensemble_gen_adv_examples(model_list, weight_list, attacker_list, test_loader, gpu, parallel, logger)
+    robust_test_acc = ensemble_gen_adv_examples(model_list, weight_list, attacker_list, test_loader, gpu, parallel, logger, fast=True)
     if writer is not None:
         writer.add_scalar('curve/robust test acc', robust_test_acc, 0)
     
