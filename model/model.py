@@ -20,15 +20,16 @@ class Model(nn.Module):
 
 
 class FusionModel(nn.Module):
-    def __init__(self, model_list, num_classes=10):
+    def __init__(self, gpu, model_list, num_classes=10):
         super(FusionModel, self).__init__()
+        self.gpu = gpu
         self.model_list = nn.ModuleList(model_list)
         self.model_num = len(model_list)
         self.num_class = num_classes
     def forward(self, x, lower=None, upper=None, targets=None):
         batch_size = x.size()[0]
-        y = torch.zeros(batch_size, self.num_class).to(self.device)
-        res = torch.zeros(batch_size, self.num_class).to(self.device)
+        y = torch.zeros(batch_size, self.num_class).cuda(self.gpu, non_blocking=True)
+        res = torch.zeros(batch_size, self.num_class).cuda(self.gpu, non_blocking=True)
 
         for model in self.model_list:
             output = model(x, lower, upper, targets)
