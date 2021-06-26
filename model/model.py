@@ -32,9 +32,13 @@ class FusionModel(nn.Module):
         res = torch.zeros(batch_size, self.num_class).cuda(self.gpu, non_blocking=True)
 
         for model in self.model_list:
-            output = model(x, lower, upper, targets)
-            y += output[0]
-            res += output[1]
+            if targets is None:
+                output = model(x, lower, upper, targets)
+                y += output
+            else:
+                output = model(x, lower, upper, targets)
+                y += output[0]
+                res += output[1]
         y /= self.model_num
         res /= self.model_num
 
