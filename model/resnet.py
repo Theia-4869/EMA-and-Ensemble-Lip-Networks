@@ -1,4 +1,3 @@
-import torch
 import torch.nn as nn
 
 from model.norm_dist import NormDistConv, NormDist
@@ -25,9 +24,9 @@ class BasicBlock(nn.Module):
         if self.shortcut is not None:
             out2 = self.shortcut(*out2)
         if out1[1] is None or out1[2] is None or out2[1] is None or out2[2] is None:
-            out = (out1[0] / 2 + out2[0] / 2, None, None)
+            out = (out1[0] * 0.8 + out2[0] * 0.2, None, None)
         else:
-            out = (out1[0] / 2 + out2[0] / 2, out1[1] / 2 + out2[1] / 2, out1[2] / 2 + out2[2] / 2)
+            out = (out1[0] * 0.8 + out2[0] * 0.2, out1[1] * 0.8 + out2[1] * 0.2, out1[2] * 0.8 + out2[2] * 0.2)
         return out
 
 
@@ -53,9 +52,9 @@ class Bottleneck(nn.Module):
         if self.shortcut is not None:
             out2 = self.shortcut(*out2)
         if out1[1] is None or out1[2] is None or out2[1] is None or out2[2] is None:
-            out = (out1[0] / 2 + out2[0] / 2, None, None)
+            out = (out1[0] * 0.8 + out2[0] * 0.2, None, None)
         else:
-            out = (out1[0] / 2 + out2[0] / 2, out1[1] / 2 + out2[1] / 2, out1[2] / 2 + out2[2] / 2)
+            out = (out1[0] * 0.8 + out2[0] * 0.2, out1[1] * 0.8 + out2[1] * 0.2, out1[2] * 0.8 + out2[2] * 0.2)
         return out
 
 
@@ -70,6 +69,10 @@ class resNet(nn.Module):
         self.layer3 = self._make_layer(block, 256, num_blocks[2], stride=2)
         self.layer4 = self._make_layer(block, 512, num_blocks[3], stride=2)
         self.avgpool = BoundAdaptiveAvgPool2d((1, 1))
+
+        for m in self.modules():
+            if isinstance(m, NormDistConv):
+                nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
 
     def _make_layer(self, block, planes, num_blocks, stride):
         strides = [stride] + [1] * (num_blocks - 1)
@@ -121,30 +124,41 @@ model_dict = {
 
 class ResNet(nn.Module):
     """backbone + projection head"""
-    def __init__(self, input_dim, name='resnet50', num_classes=10):
+    def __init__(self, input_dim, name='resnet50', feat_dim=512, num_classes=10):
         super(ResNet, self).__init__()
         model_fun, dim_in = model_dict[name]
         self.encoder = model_fun()
-        self.head = NormDist(dim_in, num_classes, bias=True, mean_normalize=False)
+        head = []
+        head.append(NormDist(dim_in, dim_in, bias=False, mean_normalize=True))
+        head.append(NormDist(dim_in, feat_dim, bias=False, mean_normalize=True))
+        head.append(NormDist(feat_dim, num_classes, bias=True, mean_normalize=False))
+        self.head = nn.ModuleList(head)
 
     def forward(self, x, lower=None, upper=None):
         paras = (x, lower, upper)
         paras = self.encoder(*paras)
         paras = [None if y is None else y.view(y.size(0), -1) for y in paras]
-        paras = self.head(*paras)
+        for layer in self.head:
+            paras = layer(*paras)
         paras = [None if y is None else -y for y in (paras[0], paras[2], paras[1])]
         return paras
 
 class ResNetFeature(nn.Module):
     """backbone + projection head"""
-    def __init__(self, input_dim, name='resnet50'):
+    def __init__(self, input_dim, name='resnet50', feat_dim=512):
         super(ResNetFeature, self).__init__()
         model_fun, dim_in = model_dict[name]
         self.encoder = model_fun()
-        self.out_features = dim_in
+        head = []
+        head.append(NormDist(dim_in, dim_in, bias=False, mean_normalize=True))
+        head.append(NormDist(dim_in, feat_dim, bias=False, mean_normalize=True))
+        self.head = nn.ModuleList(head)
+        self.out_features = feat_dim
 
     def forward(self, x, lower=None, upper=None):
         paras = (x, lower, upper)
         paras = self.encoder(*paras)
         paras = [None if y is None else y.view(y.size(0), -1) for y in paras]
+        for layer in self.head:
+            paras = layer(*paras)
         return paras

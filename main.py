@@ -313,6 +313,7 @@ def main_worker(gpu, parallel, args, result_dir):
     from model.alexnet2 import AlexNetFeature2, AlexNet2
     from model.vggnet import VGGNetFeature, VGGNet
     from model.resnet import ResNetFeature, ResNet
+    from model.wideresnet import WideResNetFeature, WideResNet
     model_name, params = parse_function_call(args.model)
     if args.predictor_hidden_size > 0:
         model = locals()[model_name](input_dim=input_dim[args.dataset], **params)
