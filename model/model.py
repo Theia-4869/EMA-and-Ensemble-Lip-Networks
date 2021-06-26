@@ -15,7 +15,7 @@ class Model(nn.Module):
             lower = x - self.eps
             upper = x + self.eps
         output1, output2 = self.predictor(x, lower, upper, targets=targets)
-        print(output1, output2)
+        print('output1=', output1, 'output2=', output2)
         return output1, output2
 
 
