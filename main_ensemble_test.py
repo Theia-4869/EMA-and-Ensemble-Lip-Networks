@@ -233,7 +233,7 @@ def main_worker(gpu, parallel, args, result_dir):
         model_name, params = parse_function_call(args.model_list[i])
         if args.predictor_hidden_size_list[i] > 0:
             model = locals()[model_name](input_dim=input_dim[args.dataset], **params)
-            predictor = Predictor(model.out_features, args.predictor_hidden_size, num_classes)
+            predictor = Predictor(model.out_features, args.predictor_hidden_size_list[i], num_classes)
         else:
             model = locals()[model_name](input_dim=input_dim[args.dataset], num_classes=num_classes, **params)
             predictor = BoundFinalIdentity()
