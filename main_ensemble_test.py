@@ -18,7 +18,7 @@ from model.norm_dist import set_p_norm, get_p_norm
 parser = argparse.ArgumentParser(description='Adversarial Robustness')
 parser.add_argument('--dataset', default='MNIST', type=str)
 parser.add_argument('--model-list', default='MLPFeature(depth=4,width=4)', type=str) # mlp,conv
-parser.add_argument('--predictor-hidden-size', default=512, type=int) # 0 means not to use linear predictor
+parser.add_argument('--predictor-hidden-size-list', default=None, type=str) # 0 means not to use linear predictor
 parser.add_argument('--loss', default='cross_entropy', type=str) # cross_entropy, hinge
 
 parser.add_argument('--p-start', default=8.0, type=float)
@@ -225,12 +225,13 @@ def main_worker(gpu, parallel, args, result_dir):
     from model.vggnet import VGGNetFeature, VGGNet
     from model.resnet import ResNetFeature, ResNet
     args.model_list = re.split(r',\s', args.model_list[1:-1])
+    args.predictor_hidden_size_list = eval(args.predictor_hidden_size_list)
     args.model_num = len(args.model_list)
     model_list = []
     weight_list = []
-    for m in args.model_list:
-        model_name, params = parse_function_call(m)
-        if args.predictor_hidden_size > 0:
+    for i in range(args.model_num):
+        model_name, params = parse_function_call(args.model_list[i])
+        if args.predictor_hidden_size_list[i] > 0:
             model = locals()[model_name](input_dim=input_dim[args.dataset], **params)
             predictor = Predictor(model.out_features, args.predictor_hidden_size, num_classes)
         else:
