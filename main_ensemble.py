@@ -37,7 +37,7 @@ parser.add_argument('--beta1', default=0.9, type=float)
 parser.add_argument('--beta2', default=0.99, type=float)
 parser.add_argument('--epsilon', default=1e-10, type=float)
 parser.add_argument('--wd', default=0.0, type=float)
-parser.add_argument('--alpha', type=float, default=0.99) # alpha for ema prototypes update
+# parser.add_argument('--alpha', type=float, default=0.99) # alpha for ema prototypes update
 
 parser.add_argument('--start-epoch', default=0, type=int)
 parser.add_argument('--checkpoint', default=None, type=str)
