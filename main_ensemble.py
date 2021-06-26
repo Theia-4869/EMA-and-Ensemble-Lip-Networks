@@ -325,7 +325,7 @@ def main_worker(gpu, parallel, args, result_dir):
             predictor = BoundFinalIdentity()
         model = Model(model, predictor, eps=0)
         model_list.append(model)
-    ensemble_model = FusionModel(gpu, model_list, num_classes)
+    ensemble_model = VotingModel(gpu, model_list, num_classes)
     ensemble_model = ensemble_model.cuda(gpu)
     if parallel:
         ensemble_model = torch.nn.parallel.DistributedDataParallel(ensemble_model, device_ids=[gpu])
