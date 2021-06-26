@@ -134,8 +134,8 @@ def ensemble_certified_test(net_list, weight_list, eps, up, down, testloader, lo
     save_p_list = []
     save_eps_list = []
     for i in range(len(net_list)):
-        save_p_list[i] = get_p_norm(net_list[i])
-        save_eps_list[i] = get_eps(net_list[i])
+        save_p_list.append(get_p_norm(net_list[i]))
+        save_eps_list.append(get_eps(net_list[i]))
         set_eps(net_list[i], eps)
         set_p_norm(net_list[i], float('inf'))
         net_list[i].eval()
