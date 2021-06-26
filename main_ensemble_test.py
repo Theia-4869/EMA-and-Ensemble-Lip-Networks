@@ -8,7 +8,7 @@ import math
 import matplotlib.pyplot as plt
 from collections import OrderedDict
 
-from utils import random_seed, create_result_dir, plot_grad_flow, Logger, TableLogger, AverageMeter
+from utils import random_seed, create_result_dir0, plot_grad_flow, Logger, TableLogger, AverageMeter
 from attack import AttackPGD
 from adamw import AdamW
 from madam import Madam
@@ -320,7 +320,7 @@ def main(father_handle, **extra_argv):
     args = parser.parse_args()
     for key, val in extra_argv.items():
         setattr(args, key, val)
-    result_dir = create_result_dir(args)
+    result_dir = create_result_dir0(args)
     if father_handle is not None:
         father_handle.put(result_dir)
     if args.gpu != -1:

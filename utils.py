@@ -53,6 +53,16 @@ def get_result_dir(args):
     return result_dir
 
 def create_result_dir(args):
+    result_dir = args.result_dir
+    id = 0
+    while True:
+        result_dir_id = result_dir + '_%d'%id
+        if not os.path.exists(result_dir_id): break
+        id += 1
+    os.makedirs(result_dir_id)
+    return result_dir_id
+
+def create_result_dir0(args):
     result_dir = get_result_dir(args)
     id = 0
     while True:
