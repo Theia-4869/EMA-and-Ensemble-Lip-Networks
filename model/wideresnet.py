@@ -25,7 +25,7 @@ class BasicBlock(nn.Module):
             out1 = self.dropout(*out1)
         out1 = self.conv2(*out1)
         out2 = paras
-        if self.shortcut is not None:
+        if self.convShortcut is not None:
             out2 = self.convShortcut(*out2)
         if out1[1] is None or out1[2] is None or out2[1] is None or out2[2] is None:
             out = (out1[0] * 0.8 + out2[0] * 0.2, None, None)
