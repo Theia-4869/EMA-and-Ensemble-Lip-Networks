@@ -313,23 +313,17 @@ def main_worker(gpu, parallel, args, result_dir):
     writer.add_scalar('curve/test loss', test_loss, 0)
     writer.add_scalar('curve/test acc', test_acc, 0)
 
-    print(weight_list)
-
     if logger is not None:
         logger.print("Generate adversarial examples on test dataset")
     robust_test_acc = ensemble_gen_adv_examples(model_list, weight_list, attacker_list, test_loader, gpu, parallel, logger, fast=True)
     if writer is not None:
         writer.add_scalar('curve/robust test acc', robust_test_acc, 0)
-
-    print(weight_list)
     
     if logger is not None:
         logger.print("Calculate certified accuracy on test dataset")
     certified_acc = ensemble_certified_test(model_list, weight_list, args.eps_test, up, down, test_loader, logger, gpu, parallel)
     if writer is not None:
         writer.add_scalar('curve/certified acc', certified_acc, 0)
-    
-    print(weight_list)
 
     if writer is not None:
         writer.close()
