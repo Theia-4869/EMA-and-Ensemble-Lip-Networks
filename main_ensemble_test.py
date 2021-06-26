@@ -131,6 +131,14 @@ def ensemble_gen_adv_examples(net_list, weight_list, attacker_list, test_loader,
 
 @torch.no_grad()
 def ensemble_certified_test(net_list, weight_list, eps, up, down, testloader, logger, gpu, parallel):
+    save_p_list = []
+    save_eps_list = []
+    for i in range(len(net_list)):
+        save_p_list[i] = get_p_norm(net_list[i])
+        save_eps_list[i] = get_eps(net_list[i])
+        set_eps(net_list[i], eps)
+        set_p_norm(net_list[i], float('inf'))
+        net_list[i].eval()
     tot_outputs = []
     labels = []
 
@@ -152,6 +160,9 @@ def ensemble_certified_test(net_list, weight_list, eps, up, down, testloader, lo
         res, = parallel_reduce(res)
     if logger is not None:
         logger.print(' certified acc ' + f'{res:.4f}')
+    for i in range(len(net_list)):
+        set_eps(net_list[i], save_p_list[i])
+        set_p_norm(net_list[i], save_eps_list[i])
     return res
 
 
