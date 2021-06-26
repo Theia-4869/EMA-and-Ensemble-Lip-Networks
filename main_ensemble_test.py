@@ -149,8 +149,8 @@ def ensemble_certified_test(net_list, weight_list, eps, up, down, testloader, lo
         targets = targets.cuda(gpu, non_blocking=True)
         outputs = 0
         for net, weight in zip(net_list, weight_list):
-            outputs += weight * net(inputs, lower=lower, upper=upper, targets=targets)
-        tot_outputs.append(outputs[1])
+            outputs += weight * net(inputs, lower=lower, upper=upper, targets=targets)[1]
+        tot_outputs.append(outputs)
         labels.append(targets)
     tot_outputs = torch.cat(tot_outputs, dim=0)
     labels = torch.cat(labels, dim=0)
