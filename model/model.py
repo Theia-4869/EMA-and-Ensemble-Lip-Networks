@@ -22,7 +22,7 @@ class Model(nn.Module):
 class FusionModel(nn.Module):
     def __init__(self, model_list, num_classes=10):
         super(FusionModel, self).__init__()
-        self.model_list = model_list
+        self.model_list = nn.ModuleList(model_list)
         self.model_num = len(model_list)
         self.num_class = num_classes
     def forward(self, x, lower=None, upper=None, targets=None):
@@ -43,7 +43,7 @@ class FusionModel(nn.Module):
 class VotingModel(nn.Module):
     def __init__(self, model_list, num_classes=10):
         super(VotingModel, self).__init__()
-        self.model_list = model_list
+        self.model_list = nn.ModuleList(model_list)
         self.model_num = len(model_list)
         self.num_class = num_classes
     def forward(self, x, lower=None, upper=None, targets=None):
