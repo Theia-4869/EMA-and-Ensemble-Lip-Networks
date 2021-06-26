@@ -1,4 +1,6 @@
+import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 class Model(nn.Module):
     def __init__(self, feature, predictor, eps):
@@ -14,43 +16,49 @@ class Model(nn.Module):
         if targets is not None and (lower is None or upper is None):
             lower = x - self.eps
             upper = x + self.eps
-        output1, output2 = self.predictor(x, lower, upper, targets=targets)
-        print('output1.size=', output1.size(), 'output2.size=', output2.size())
-        return output1, output2
+        return self.predictor(x, lower, upper, targets=targets)
 
 
 class FusionModel(nn.Module):
-    def __init__(self, feature, predictor, eps):
+    def __init__(self, model_list, num_classes=10):
         super(Model, self).__init__()
-        self.feature = feature
-        self.predictor = predictor
-        self.eps = eps
+        self.model_list = model_list
+        self.model_num = len(model_list)
+        self.num_class = num_classes
     def forward(self, x, lower=None, upper=None, targets=None):
-        if targets is None:
-            lower = upper = None
-        if self.feature is not None:
-            x, lower, upper = self.feature(x, lower=lower, upper=upper)
-        if targets is not None and (lower is None or upper is None):
-            lower = x - self.eps
-            upper = x + self.eps
-        return self.predictor(x, lower, upper, targets=targets)
+        batch_size = x.size()[0]
+        y = torch.zeros(batch_size, self.num_class).to(self.device)
+        res = torch.zeros(batch_size, self.num_class).to(self.device)
+
+        for model in self.model_list:
+            output = model(x, lower, upper, targets)
+            y += output[0]
+            res += output[1]
+        y /= self.model_num
+        res /= self.model_num
+
+        return y, res
 
 
 class VotingModel(nn.Module):
-    def __init__(self, feature, predictor, eps):
+    def __init__(self, model_list, num_classes=10):
         super(Model, self).__init__()
-        self.feature = feature
-        self.predictor = predictor
-        self.eps = eps
+        self.model_list = model_list
+        self.model_num = len(model_list)
+        self.num_class = num_classes
     def forward(self, x, lower=None, upper=None, targets=None):
-        if targets is None:
-            lower = upper = None
-        if self.feature is not None:
-            x, lower, upper = self.feature(x, lower=lower, upper=upper)
-        if targets is not None and (lower is None or upper is None):
-            lower = x - self.eps
-            upper = x + self.eps
-        return self.predictor(x, lower, upper, targets=targets)
+        batch_size = x.size()[0]
+        y = torch.zeros(batch_size, self.num_class).to(self.device)
+        res = torch.zeros(batch_size, self.num_class).to(self.device)
+
+        for model in self.model_list:
+            output = model(x, lower, upper, targets)
+            y += F.softmax(output[0], dim=1)
+            res += F.softmax(output[1], dim=1)
+        y /= self.model_num
+        res /= self.model_num
+
+        return y, res
 
 
 def set_eps(model, eps):
