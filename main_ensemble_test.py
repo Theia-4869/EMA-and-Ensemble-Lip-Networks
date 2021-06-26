@@ -99,34 +99,32 @@ def ensemble_gen_adv_examples(net_list, weight_list, attacker_list, test_loader,
     correct = 0
     tot_num = 0
     size = len(test_loader)
-    tot_acc = 0
-    for attacker in attacker_list:
-        for batch_idx, (inputs, targets) in enumerate(test_loader):
-            inputs = inputs.cuda(gpu, non_blocking=True)
-            targets = targets.cuda(gpu, non_blocking=True)
-            result = torch.ones(targets.size(
-                0), dtype=torch.bool, device=targets.device)
-            for i in range(1):
-                perturb = attacker.find(inputs, targets)
-                with torch.no_grad():
-                    outputs = 0
-                    for net, weight in zip(net_list, weight_list):
-                        outputs += weight * net(perturb)
-                    predicted = torch.max(outputs.data, 1)[1]
-                    result &= (predicted == targets)
-            correct += result.float().sum().item()
-            tot_num += inputs.size(0)
-            if fast and batch_idx * 10 >= size:
-                break
+    for batch_idx, (inputs, targets) in enumerate(test_loader):
+        inputs = inputs.cuda(gpu, non_blocking=True)
+        targets = targets.cuda(gpu, non_blocking=True)
+        result = torch.ones(targets.size(0), dtype=torch.bool, device=targets.device)
+        perturb_sum = 0
+        for attacker, weight in zip(attacker_list, weight_list):
+            perturb_sum += weight * attacker.find(inputs, targets)
+        perturb = perturb_sum / sum(weight_list)
+        with torch.no_grad():
+            outputs = 0
+            for net, weight in zip(net_list, weight_list):
+                outputs += weight * net(perturb)
+            predicted = torch.max(outputs.data, 1)[1]
+            result &= (predicted == targets)
+        correct += result.float().sum().item()
+        tot_num += inputs.size(0)
+        if fast and batch_idx * 10 >= size:
+            break
 
-        acc = correct / tot_num * 100
-        if parallel:
-            acc, = parallel_reduce(acc)
-        tot_acc = max(tot_acc, acc)
-    
+    acc = correct / tot_num * 100
+    if parallel:
+        acc, = parallel_reduce(acc)
+          
     if logger is not None:
-            logger.print('adversarial attack acc ' + f'{tot_acc:.4f}')
-    return tot_acc
+            logger.print('adversarial attack acc ' + f'{acc:.4f}')
+    return acc
 
 
 @torch.no_grad()
