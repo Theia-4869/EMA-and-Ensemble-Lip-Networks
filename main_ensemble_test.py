@@ -253,8 +253,9 @@ def main_worker(gpu, parallel, args, result_dir):
         for arg in vars(args):
             logger.print(arg, '=', getattr(args, arg))
         logger.print(train_loader.dataset.transform)
-        logger.print(model)
-        logger.print('number of params: ', sum([p.numel() for p in model.parameters()]))
+        for m in model_list:
+            logger.print(model)
+            logger.print('number of params: ', sum([p.numel() for p in model.parameters()]))
         logger.print('Using loss', loss)
         test_logger = TableLogger(os.path.join(result_dir, 'test.log'), ['loss', 'acc'])
     else:
@@ -275,7 +276,7 @@ def main_worker(gpu, parallel, args, result_dir):
                 new_state_dict = OrderedDict([('module.' + k, v) for k, v in state_dict.items()])
                 state_dict = new_state_dict
             m.load_state_dict(state_dict)
-            print("=> loaded '{}'".format(args.checkpoint))
+            print("=> loaded '{}'".format(c))
             if parallel:
                 torch.distributed.barrier()
 
