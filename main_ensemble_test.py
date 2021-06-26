@@ -95,13 +95,12 @@ def ensemble_test(net_list, weight_list, loss_fun, testloader, logger, test_logg
     return loss, acc
 
 
-def ensemble_gen_adv_examples(model_list, weight_list, attacker_list, test_loader, gpu, parallel, logger, fast=False):
+def ensemble_gen_adv_examples(net_list, weight_list, attacker_list, test_loader, gpu, parallel, logger, fast=False):
     correct = 0
     tot_num = 0
     size = len(test_loader)
-    net_list = model_list
     tot_acc = 0
-    for model, attacker in zip(model_list, attacker_list):
+    for attacker in attacker_list:
         for batch_idx, (inputs, targets) in enumerate(test_loader):
             inputs = inputs.cuda(gpu, non_blocking=True)
             targets = targets.cuda(gpu, non_blocking=True)
