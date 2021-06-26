@@ -325,6 +325,7 @@ def main_worker(gpu, parallel, args, result_dir):
             predictor = BoundFinalIdentity()
         model = Model(model, predictor, eps=0)
         model_list.append(model)
+    print(model_list)
     ensemble_model = FusionModel(model_list, num_classes)
     ensemble_model = ensemble_model.cuda(gpu)
     if parallel:
