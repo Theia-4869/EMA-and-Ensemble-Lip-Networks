@@ -123,7 +123,6 @@ def ensemble_gen_adv_examples(net_list, weight_list, attacker_list, test_loader,
         if parallel:
             acc, = parallel_reduce(acc)
         tot_acc = max(tot_acc, acc)
-        
     
     if logger is not None:
             logger.print('adversarial attack acc ' + f'{tot_acc:.4f}')
@@ -311,7 +310,7 @@ def main_worker(gpu, parallel, args, result_dir):
     
     if logger is not None:
         logger.print("Calculate certified accuracy on test dataset")
-    certified_acc = ensemble_certified_test(model, weight_list, args.eps_test, up, down, test_loader, logger, gpu, parallel)
+    certified_acc = ensemble_certified_test(model_list, weight_list, args.eps_test, up, down, test_loader, logger, gpu, parallel)
     if writer is not None:
         writer.add_scalar('curve/certified acc', certified_acc, 0)
 
