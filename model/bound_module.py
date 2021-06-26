@@ -149,3 +149,15 @@ class BoundAdaptiveAvgPool2d(nn.AdaptiveAvgPool2d):
         if lower is None or upper is None:
             return y, None, None
         return y, super(BoundAdaptiveAvgPool2d, self).forward(lower), super(BoundAdaptiveAvgPool2d, self).forward(upper)
+
+class BoundDropout(nn.Dropout):
+    def __init__(self, p):
+        super(BoundDropout, self).__init__(p=p)
+
+    def forward(self, x, lower=None, upper=None):
+        mask = super(BoundDropout, self).forward(torch.ones_like(x))
+        y = mask*x
+        if lower is None or upper is None:
+            return y, None, None
+        return y, mask*lower, mask*upper
+
