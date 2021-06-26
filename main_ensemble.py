@@ -329,7 +329,7 @@ def main_worker(gpu, parallel, args, result_dir):
     ensemble_model = ensemble_model.cuda(gpu)
     if parallel:
         ensemble_model = torch.nn.parallel.DistributedDataParallel(ensemble_model, device_ids=[gpu])
-    print(ensemble_model)
+    print(ensemble_model.model_list)
     
     # from utils import EMA
     # ema = EMA(ensemble_model, 0.999)
