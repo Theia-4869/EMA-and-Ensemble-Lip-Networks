@@ -276,6 +276,7 @@ def main_worker(gpu, parallel, args, result_dir):
                 new_state_dict = OrderedDict([('module.' + k, v) for k, v in state_dict.items()])
                 state_dict = new_state_dict
             m.load_state_dict(state_dict)
+            set_p_norm(m, float('inf'))
             print("=> loaded '{}'".format(c))
             if parallel:
                 torch.distributed.barrier()
