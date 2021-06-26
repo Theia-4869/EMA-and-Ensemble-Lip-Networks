@@ -38,6 +38,8 @@ class FusionModel(nn.Module):
         y /= self.model_num
         res /= self.model_num
 
+        if targets is None:
+            return y
         return y, res
 
 
