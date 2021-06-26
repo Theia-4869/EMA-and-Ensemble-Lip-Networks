@@ -14,9 +14,9 @@ class Model(nn.Module):
         if targets is not None and (lower is None or upper is None):
             lower = x - self.eps
             upper = x + self.eps
-        output = self.predictor(x, lower, upper, targets=targets)
-        print(output)
-        return output
+        output1, output2 = self.predictor(x, lower, upper, targets=targets)
+        print(output1, output2)
+        return output1, output2
 
 
 class FusionModel(nn.Module):
