@@ -25,9 +25,9 @@ class BasicBlock(nn.Module):
         if self.shortcut is not None:
             out2 = self.shortcut(*out2)
         if out1[1] is None or out1[2] is None or out2[1] is None or out2[2] is None:
-            out = (out1[0] + out2[0], None, None)
+            out = (out1[0] / 2 + out2[0] / 2, None, None)
         else:
-            out = (out1[0] + out2[0], out1[1] + out2[1], out1[2] + out2[2])
+            out = (out1[0] / 2 + out2[0] / 2, out1[1] / 2 + out2[1] / 2, out1[2] / 2 + out2[2] / 2)
         return out
 
 
@@ -53,9 +53,9 @@ class Bottleneck(nn.Module):
         if self.shortcut is not None:
             out2 = self.shortcut(*out2)
         if out1[1] is None or out1[2] is None or out2[1] is None or out2[2] is None:
-            out = (out1[0] + out2[0], None, None)
+            out = (out1[0] / 2 + out2[0] / 2, None, None)
         else:
-            out = (out1[0] + out2[0], out1[1] + out2[1], out1[2] + out2[2])
+            out = (out1[0] / 2 + out2[0] / 2, out1[1] / 2 + out2[1] / 2, out1[2] / 2 + out2[2] / 2)
         return out
 
 
@@ -121,54 +121,30 @@ model_dict = {
 
 class ResNet(nn.Module):
     """backbone + projection head"""
-    def __init__(self, input_dim, name='resnet50', head_name='mlp', feat_dim=512, num_classes=10):
+    def __init__(self, input_dim, name='resnet50', num_classes=10):
         super(ResNet, self).__init__()
         model_fun, dim_in = model_dict[name]
         self.encoder = model_fun()
-        head = []
-        if head_name == 'linear':
-            head.append(NormDist(dim_in, feat_dim, bias=False, mean_normalize=True))
-            head.append(NormDist(feat_dim, num_classes, bias=True, mean_normalize=False))
-        elif head_name == 'mlp':
-            head.append(NormDist(dim_in, dim_in, bias=False, mean_normalize=True))
-            head.append(NormDist(dim_in, feat_dim, bias=False, mean_normalize=True))
-            head.append(NormDist(feat_dim, num_classes, bias=True, mean_normalize=False))
-        else:
-            raise NotImplementedError(
-                'head not supported: {}'.format(head))
-        self.head = nn.ModuleList(head)
+        self.head = NormDist(dim_in, num_classes, bias=True, mean_normalize=False)
 
     def forward(self, x, lower=None, upper=None):
         paras = (x, lower, upper)
         paras = self.encoder(*paras)
         paras = [None if y is None else y.view(y.size(0), -1) for y in paras]
-        for layer in self.head:
-            paras = layer(*paras)
+        paras = self.head(*paras)
         paras = [None if y is None else -y for y in (paras[0], paras[2], paras[1])]
         return paras
 
 class ResNetFeature(nn.Module):
     """backbone + projection head"""
-    def __init__(self, input_dim, name='resnet50', head_name='mlp', feat_dim=512):
+    def __init__(self, input_dim, name='resnet50'):
         super(ResNetFeature, self).__init__()
         model_fun, dim_in = model_dict[name]
         self.encoder = model_fun()
-        head = []
-        if head_name == 'linear':
-            head.append(NormDist(dim_in, feat_dim, bias=False, mean_normalize=True))
-        elif head_name == 'mlp':
-            head.append(NormDist(dim_in, dim_in, bias=False, mean_normalize=True))
-            head.append(NormDist(dim_in, feat_dim, bias=False, mean_normalize=True))
-        else:
-            raise NotImplementedError(
-                'head not supported: {}'.format(head))
-        self.head = nn.ModuleList(head)
-        self.out_features = feat_dim
+        self.out_features = dim_in
 
     def forward(self, x, lower=None, upper=None):
         paras = (x, lower, upper)
         paras = self.encoder(*paras)
         paras = [None if y is None else y.view(y.size(0), -1) for y in paras]
-        for layer in self.head:
-            paras = layer(*paras)
         return paras
