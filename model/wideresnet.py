@@ -81,7 +81,6 @@ class wideResNet(nn.Module):
         paras = self.conv(*paras)
         paras = self.block1(*paras)
         paras = self.block2(*paras)
-        paras = self.maxpool(*paras)
         return paras
 
 
@@ -90,7 +89,7 @@ class WideResNet(nn.Module):
     def __init__(self, input_dim, feat_dim=512, num_classes=10):
         super(WideResNet, self).__init__()
         self.encoder = wideResNet()
-        dim_in = 64
+        dim_in = 16384
         head = []
         head.append(NormDist(dim_in, feat_dim, bias=False, mean_normalize=True))
         head.append(NormDist(feat_dim, num_classes, bias=True, mean_normalize=False))
