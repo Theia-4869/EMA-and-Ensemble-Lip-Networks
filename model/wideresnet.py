@@ -81,7 +81,6 @@ class wideResNet(nn.Module):
         paras = self.conv(*paras)
         paras = self.block1(*paras)
         paras = self.block2(*paras)
-        paras = self.avgpool(*paras)
         return paras
 
 
@@ -100,6 +99,7 @@ class WideResNet(nn.Module):
         paras = (x, lower, upper)
         paras = self.encoder(*paras)
         paras = [None if y is None else y.view(y.size(0), -1) for y in paras]
+        print(paras[0].size())
         for layer in self.head:
             paras = layer(*paras)
         paras = [None if y is None else -y for y in (paras[0], paras[2], paras[1])]
