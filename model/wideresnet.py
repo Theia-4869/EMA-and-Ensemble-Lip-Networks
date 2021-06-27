@@ -84,7 +84,6 @@ class wideResNet(nn.Module):
         paras = self.block1(*paras)
         paras = self.block2(*paras)
         paras = self.block3(*paras)
-        paras = self.avgpool(*paras)
         return paras
 
 
