@@ -67,7 +67,7 @@ class wideResNet(nn.Module):
         # 2nd block
         self.block2 = NetworkBlock(n, channels[1], channels[2], block, 2, drop_rate)
         # avgpool before fc layer
-        self.avgpool = BoundAdaptiveMaxPool2d(1)
+        self.maxpool = BoundAdaptiveMaxPool2d(1)
 
         for m in self.modules():
             if isinstance(m, NormDistConv):
