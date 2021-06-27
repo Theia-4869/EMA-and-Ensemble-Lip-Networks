@@ -37,7 +37,7 @@ parser.add_argument('--beta1', default=0.9, type=float)
 parser.add_argument('--beta2', default=0.99, type=float)
 parser.add_argument('--epsilon', default=1e-10, type=float)
 parser.add_argument('--wd', default=0.0, type=float)
-# parser.add_argument('--alpha', type=float, default=0.99) # alpha for ema prototypes update
+parser.add_argument('--alpha', type=float, default=0.99) # alpha for ema prototypes update
 
 parser.add_argument('--start-epoch', default=0, type=int)
 parser.add_argument('--checkpoint', default=None, type=str)
@@ -66,7 +66,7 @@ def parallel_reduce(*argv):
     return ret.tolist()
 
 
-def train(net, loss_fun, epoch, trainloader, optimizer, schedule, logger, train_logger, gpu, parallel, print_freq, result_dir):
+def train(net, ema, loss_fun, epoch, trainloader, optimizer, schedule, logger, train_logger, gpu, parallel, print_freq, result_dir):
     if logger is not None:
         logger.print('Epoch %d training start' % (epoch))
     net.train()
@@ -87,7 +87,7 @@ def train(net, loss_fun, epoch, trainloader, optimizer, schedule, logger, train_
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
-        # ema.update(epoch)
+        ema.update(epoch)
 
         batch_time.update(time.time() - start)
         if (batch_idx + 1) % print_freq == 0 and logger is not None:
@@ -123,9 +123,9 @@ def train(net, loss_fun, epoch, trainloader, optimizer, schedule, logger, train_
 
 
 @torch.no_grad()
-def test(net, loss_fun, epoch, testloader, logger, test_logger, gpu, parallel, print_freq):
+def test(net, ema, loss_fun, epoch, testloader, logger, test_logger, gpu, parallel, print_freq):
     net.eval()
-    # ema.apply_shadow()
+    ema.apply_shadow()
     batch_time, data_time, losses, accs = [AverageMeter() for _ in range(4)]
     start = time.time()
     test_loader_len = len(testloader)
@@ -146,7 +146,7 @@ def test(net, loss_fun, epoch, testloader, logger, test_logger, gpu, parallel, p
                          'Acc {acc.val:.4f} ({acc.avg:.4f})\t'.format(
                          batch_idx + 1, test_loader_len, batch_time=batch_time, loss=losses, acc=accs))
 
-    # ema.restore()
+    ema.restore()
     loss, acc = losses.avg, accs.avg
     if parallel:
         loss, acc = parallel_reduce(losses.avg, accs.avg)
@@ -314,6 +314,7 @@ def main_worker(gpu, parallel, args, result_dir):
     from model.alexnet2 import AlexNetFeature2, AlexNet2
     from model.vggnet import VGGNetFeature, VGGNet
     from model.resnet import ResNetFeature, ResNet
+    from model.wideresnet import WideResNetFeature, WideResNet
     model_name, params = parse_function_call(args.model)
     model_list = []
     for i in range(args.model_num):
@@ -330,9 +331,9 @@ def main_worker(gpu, parallel, args, result_dir):
     if parallel:
         ensemble_model = torch.nn.parallel.DistributedDataParallel(ensemble_model, device_ids=[gpu])
     
-    # from utils import EMA
-    # ema = EMA(ensemble_model, 0.999)
-    # ema.register()
+    from utils import EMA
+    ema = EMA(ensemble_model, args.alpha)
+    ema.register()
 
     loss_name, params = parse_function_call(args.loss)
     loss = Loss(globals()[loss_name](**params), args.kappa)
@@ -395,9 +396,9 @@ def main_worker(gpu, parallel, args, result_dir):
     for epoch in range(args.start_epoch, args.epochs[-1]):
         if parallel:
             train_loader.sampler.set_epoch(epoch)
-        train_loss, train_acc = train(ensemble_model, loss, epoch, train_loader, optimizer, schedule,
+        train_loss, train_acc = train(ensemble_model, ema, loss, epoch, train_loader, optimizer, schedule,
                                       logger, train_logger, gpu, parallel, args.print_freq, result_dir)
-        test_loss, test_acc = test(ensemble_model, loss, epoch, test_loader, logger, test_logger, gpu, parallel, args.print_freq)
+        test_loss, test_acc = test(ensemble_model, ema, loss, epoch, test_loader, logger, test_logger, gpu, parallel, args.print_freq)
         if writer is not None:
             writer.add_scalar('curve/p', get_p_norm(ensemble_model), epoch)
             writer.add_scalar('curve/train loss', train_loss, epoch)
