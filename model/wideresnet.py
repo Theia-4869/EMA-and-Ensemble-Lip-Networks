@@ -31,7 +31,7 @@ class BasicBlock(nn.Module):
             out = (out1[0] * 0.8 + out2[0] * 0.2, None, None)
         else:
             out = (out1[0] * 0.8 + out2[0] * 0.2, out1[1] * 0.8 + out2[1] * 0.2, out1[2] * 0.8 + out2[2] * 0.2)
-        return out
+        return out1
 
 
 class NetworkBlock(nn.Module):
