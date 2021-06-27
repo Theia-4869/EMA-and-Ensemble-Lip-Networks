@@ -66,8 +66,10 @@ class wideResNet(nn.Module):
         self.block1 = NetworkBlock(n, channels[0], channels[1], block, 1, drop_rate)
         # 2nd block
         self.block2 = NetworkBlock(n, channels[1], channels[2], block, 2, drop_rate)
+        # 3rd block
+        self.block3 = NetworkBlock(n, channels[2], channels[3], block, 2, drop_rate)
         # avgpool before fc layer
-        self.maxpool = BoundAdaptiveMaxPool2d(1)
+        self.avgpool = BoundAdaptiveAvgPool2d(1)
 
         for m in self.modules():
             if isinstance(m, NormDistConv):
@@ -81,6 +83,8 @@ class wideResNet(nn.Module):
         paras = self.conv(*paras)
         paras = self.block1(*paras)
         paras = self.block2(*paras)
+        paras = self.block3(*paras)
+        paras = self.avgpool(*paras)
         return paras
 
 
@@ -89,8 +93,9 @@ class WideResNet(nn.Module):
     def __init__(self, input_dim, feat_dim=512, num_classes=10):
         super(WideResNet, self).__init__()
         self.encoder = wideResNet()
-        dim_in = 16384
+        dim_in = 128
         head = []
+        head.append(NormDist(dim_in, dim_in, bias=False, mean_normalize=True))
         head.append(NormDist(dim_in, feat_dim, bias=False, mean_normalize=True))
         head.append(NormDist(feat_dim, num_classes, bias=True, mean_normalize=False))
         self.head = nn.ModuleList(head)
@@ -109,8 +114,9 @@ class WideResNetFeature(nn.Module):
     def __init__(self, input_dim, feat_dim=512):
         super(WideResNetFeature, self).__init__()
         self.encoder = wideResNet()
-        dim_in = 64
+        dim_in = 128
         head = []
+        head.append(NormDist(dim_in, dim_in, bias=False, mean_normalize=True))
         head.append(NormDist(dim_in, feat_dim, bias=False, mean_normalize=True))
         self.head = nn.ModuleList(head)
         self.out_features = feat_dim
