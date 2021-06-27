@@ -31,7 +31,7 @@ class BasicBlock(nn.Module):
             out = (out1[0] * 0.8 + out2[0] * 0.2, None, None)
         else:
             out = (out1[0] * 0.8 + out2[0] * 0.2, out1[1] * 0.8 + out2[1] * 0.2, out1[2] * 0.8 + out2[2] * 0.2)
-        return out1
+        return out
 
 
 class NetworkBlock(nn.Module):
@@ -67,7 +67,7 @@ class wideResNet(nn.Module):
         # 2nd block
         self.block2 = NetworkBlock(n, channels[1], channels[2], block, 2, drop_rate)
         # avgpool before fc layer
-        self.avgpool = BoundAdaptiveAvgPool2d(1)
+        self.avgpool = BoundAvgPool2d(1)
 
         for m in self.modules():
             if isinstance(m, NormDistConv):
