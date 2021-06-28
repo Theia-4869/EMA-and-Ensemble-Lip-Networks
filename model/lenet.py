@@ -61,7 +61,6 @@ class LeNetFeature(nn.Module):
         for layer in self.conv2:
             paras = layer(*paras)
         paras = [None if y is None else y.view(y.size(0), -1) for y in paras]
-        print(paras[0].size())
         for layer in self.fc:
             paras = layer(*paras)
         return paras
