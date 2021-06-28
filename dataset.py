@@ -18,8 +18,8 @@ std = {
     'CIFAR100': 0.2667, #np.array([0.2675, 0.2565, 0.2761])
 }
 train_transforms = {
-    'MNIST': [transforms.RandomCrop(28, padding=1)],
-    'FashionMNIST': [transforms.RandomCrop(28, padding=1)],
+    'MNIST': [transforms.RandomCrop(32, padding=1)],
+    'FashionMNIST': [transforms.RandomCrop(32, padding=1)],
     'CIFAR10': [transforms.RandomCrop(32, padding=4), transforms.RandomHorizontalFlip()],
     'CIFAR100': [transforms.RandomCrop(32, padding=4), transforms.RandomHorizontalFlip()],
     # 'CIFAR10':[transforms.RandomCrop(32, padding=4),
