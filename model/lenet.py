@@ -39,7 +39,7 @@ class LeNetFeature(nn.Module):
     def __init__(self, input_dim, hidden=512):
         super(LeNetFeature, self).__init__()
         conv1 = []
-        conv1.append(NormDistConv(1, 6, 5, 1, 2, bias=False, mean_normalize=True))
+        conv1.append(NormDistConv(3, 6, 5, bias=False, mean_normalize=True))
         conv1.append(BoundMaxPool2d(2))
         self.conv1 = nn.ModuleList(conv1)
 
