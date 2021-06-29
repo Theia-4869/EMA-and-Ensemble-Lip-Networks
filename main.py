@@ -400,7 +400,7 @@ def main_worker(gpu, parallel, args, result_dir):
             writer.add_scalar('curve/test loss', test_loss, epoch)
             writer.add_scalar('curve/train acc', train_acc, epoch)
             writer.add_scalar('curve/test acc', test_acc, epoch)
-        if epoch % 50 == 49:
+        if epoch % 5 == 4:
             if logger is not None:
                 logger.print('Generate adversarial examples on training dataset and test dataset (fast, inaccurate)')
             robust_train_acc = gen_adv_examples(model, attacker, train_loader, gpu, parallel, logger, fast=True)
@@ -408,7 +408,6 @@ def main_worker(gpu, parallel, args, result_dir):
             if writer is not None:
                 writer.add_scalar('curve/robust train acc', robust_train_acc, epoch)
                 writer.add_scalar('curve/robust test acc', robust_test_acc, epoch)
-        if epoch % 5 == 4:
             certified_acc = certified_test(model, args.eps_test, up, down, epoch, test_loader, logger, gpu, parallel)
             if writer is not None:
                 writer.add_scalar('curve/certified acc', certified_acc, epoch)
