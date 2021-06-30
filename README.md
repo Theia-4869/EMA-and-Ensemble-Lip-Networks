@@ -1,13 +1,16 @@
-# A few results on certified robustness  
+# Boosting Certified $\ell_\infty$-dist Robustness with EMA Method and Ensemble Model
 
 ## Introduction
 
-This is the official code for training the L_inf-dist net, a theoretically principled neural network that inherently resists L_inf-norm perturbations. We consistently achieve state-of-the-art performance on commonly used datasets: **93.09%** certiﬁed accuracy on MNIST under eps = 0.3, **79.23%** on Fashion-MNIST under eps = 0.1 and **35.10%** on CIFAR-10 under eps = 8/255. Our paper is on [arxiv](  https://arxiv.org/abs/2102.05363  ).
+This is our project code for [Boosting Certified $\ell_\infty$-dist Robustness with EMA Method and Ensemble Model](). We use EMA technique and model ensemble method to improve performance and robustness of our model and also use $\ell_\infty$-dist neurons to build commonly used CNN architectures. The $\ell_\infty$-dist neurons we use are implemented in [$\ell_\infty$-dist Net](https://github.com/zbh2047/L_inf-dist-net). We achieve state-of-the-art performance on commonly used datasets: **93.14%** certiﬁed accuracy on MNIST under eps = 0.3 and **35.42%** on CIFAR-10 under eps = 8/255. We also use lightweight network $\ell_\infty$-dist LeNet with very few parameters to achieve **35.42%** on CIFAR-10 under eps = 8/255. Our paper is on [arxiv]().
 
 ## Dependencies
 
-- Pytorch 1.6.0
-- Tensorboard (optional)
+- torch 1.8.1
+- torchvision 0.9.1
+- numpy 1.20.2
+- matplotlib 3.4.0
+- tensorboard
 
 ## Getting Started with the Code
 
@@ -19,20 +22,34 @@ After cloning this repo into your computer, first run the following command to i
 python setup.py install --user
 ```
 
-### Reproducing SOTA Results
+### Usage
 
-In this repo, we provide complete training scripts to reproduce the results on MNIST, Fashion-MNIST and CIFAR-10 datasets in our paper. These scripts are in the `command` folder. 
-
-For example, to reproduce the results of CIFAR-10 using the $\ell_\infty$-dist Net alone, simply run
-
+You can train your $\ell_\infty$-dist nets and test their performance using the command below:
 ```
-bash command/ell_inf_dist_net_cifar10.sh
+python main.py
 ```
 
-To reproduce the results of CIFAR-10 using the $\ell_\infty$-dist Net+MLP, simply run
+Choose `--model`(MLP, Conv, LeNet, AlexNet, VGGNet) for network architecture, `--dataset`(MNIST, FashionMNIST, CIFAR10, CIFAR100) for dataset, `--predictor-hidden-size` for the hidden size of Predictor, `--loss`(hinge, cross_entropy) for loss function type and `--opt`(adamw, madam) for optimizer type.  
+
+You can also train your ensemble $\ell_\infty$-dist nets and test their performance using the command below:
+```
+python main_ensemble.py
+```
+
+In addition to the above options, you can choose `--model-num` for number of ensemble models.  
+
+In this repo, we provide complete training scripts as well. You can run the scripts directly to reproduce the results on MNIST, Fashion-MNIST, CIFAR-10 and CIFAR-100 datasets in our paper. The scripts are in the `command` folder.  
+
+For example, to reproduce the results of MNIST using a single $\ell_\infty$-dist Net+MLP , simply run
 
 ```
-bash command/ell_inf_dist_net++_cifar10.sh
+bash command/lipnet++_mnist.sh
+```
+
+And to reproduce the results of CIFAR-10 using ensemble $\ell_\infty$-dist LeNet+MLP, simply run
+
+```
+bash command/liplenet++_ensemble_cifar10.sh
 ```
 
 ## Advanced Training Options
@@ -47,22 +64,8 @@ The model is automatically saved when the training procedure finishes. Use `--ch
 
 ### Displaying training curves
 
-By default the code will generate three files named `train.log`, `test.log` and `log.txt` which contain all training logs. If you want to further display training curves, you can add the parameter `--visualize` to show these curves using Tensorboard. 
+By default the code will generate three files named `train.log`, `test.log` and `log.txt` which contain all training logs. If you want to further display training curves, you can add the parameter `--visualize` to show these curves using Tensorboard.
 
 ## Contact
 
-Please contact [zhangbohang@pku.edu.cn](zhangbohang@pku.edu.cn)  if you have any question on our paper or the codes. Enjoy! 
-
-## Citation
-
-```
-@article{zhang2021certifying,
-      title={Towards Certifying $\ell_\infty$ Robustness using Neural Networks with $\ell_\infty$-dist Neurons}, 
-      author={Bohang Zhang and Tianle Cai and Zhou Lu and Di He and Liwei Wang},
-      year={2021},
-      eprint={2102.05363},
-      archivePrefix={arXiv},
-      primaryClass={cs.LG}
-}
-```
-
+Please contact [theia@pku.edu.cn](theia@pku.edu.cn)  if you have any question on our paper or the codes. Enjoy!
