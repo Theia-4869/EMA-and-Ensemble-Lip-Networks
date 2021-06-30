@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This is our project code for [Boosting Certified $\ell_\infty$-dist Robustness with EMA Method and Ensemble Model](). We use EMA technique and model ensemble method to improve performance and robustness of our model and also use $\ell_\infty$-dist neurons to build commonly used CNN architectures. The $\ell_\infty$-dist neurons we use are implemented in [$\ell_\infty$-dist Net](https://github.com/zbh2047/L_inf-dist-net). We achieve state-of-the-art performance on commonly used datasets: **93.14%** certiﬁed accuracy on MNIST under eps = 0.3 and **35.42%** on CIFAR-10 under eps = 8/255. We also use lightweight network $\ell_\infty$-dist LeNet with very few parameters to achieve **33.42%** on CIFAR-10 under eps = 8/255. Our paper is on [arxiv]().
+This is the code for [Boosting Certified $\ell_\infty$-dist Robustness with EMA Method and Ensemble Model](). We use the EMA technique and model ensemble method to improve the performance and robustness of our model. We also use $\ell_\infty$-dist neurons to build commonly used CNN architectures. The $\ell_\infty$-dist neurons we use are implemented in [$\ell_\infty$-dist Net](https://github.com/zbh2047/L_inf-dist-net). We achieve state-of-the-art performance on commonly used datasets: **93.14%** certiﬁed accuracy on MNIST under eps = 0.3 and **35.42%** on CIFAR-10 under eps = 8/255. We also use lightweight network $\ell_\infty$-dist LeNet with very few parameters to achieve **33.42%** on CIFAR-10 under eps = 8/255. Our paper is on [arxiv]().
 
 ## Dependencies
 
